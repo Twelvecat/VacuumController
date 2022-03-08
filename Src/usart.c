@@ -193,6 +193,7 @@ int fputc(int ch, FILE *f){
 	HAL_UART_Transmit(&huart2, temp, 1, 2);//huart1需要根据你的配置修改
 	return ch;
 }
+
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

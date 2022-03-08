@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "led.h": "c",
+        "main.h": "c",
+        "relay.h": "c",
+        "hp5806.h": "c"
+    }
+}
