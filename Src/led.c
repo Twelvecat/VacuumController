@@ -2,24 +2,24 @@
 
 void InitLED(void){
 	CloseLED();
-	user_led_info("LED³õÊ¼»¯Íê³É");
+	user_led_info("LEDåˆå§‹åŒ–å®Œæˆ");
 }
 
 void InitRGB(void){
 	CloseRGB_R();
 	CloseRGB_G();
 	CloseRGB_B();
-	user_led_info("RGB³õÊ¼»¯Íê³É");
+	user_led_info("RGBåˆå§‹åŒ–å®Œæˆ");
 }
 
 void OpenLED(void){
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-	user_led_info("LEDÒÑµãÁÁ");
+	user_led_info("LEDå·²ç‚¹äº®");
 }
 
 void ToggleLED(void){
 	HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
-	user_led_info("LEDÒÑµã·­×ª");
+	user_led_info("LEDå·²ç‚¹ç¿»è½¬");
 	HAL_GPIO_TogglePin(RGB_G_GPIO_Port,RGB_G_Pin);
 	HAL_GPIO_TogglePin(RGB_R_GPIO_Port,RGB_R_Pin);
 	
@@ -27,36 +27,36 @@ void ToggleLED(void){
 
 void OpenRGB_R(void){
 	HAL_GPIO_WritePin(RGB_R_GPIO_Port, RGB_R_Pin, GPIO_PIN_RESET);
-	user_led_info("RGBÒÑµãÁÁºìµÆ");
+	user_led_info("RGBå·²ç‚¹äº®çº¢ç¯");
 }
 
 void OpenRGB_G(void){
 	HAL_GPIO_WritePin(RGB_G_GPIO_Port, RGB_G_Pin, GPIO_PIN_RESET);
-	user_led_info("RGBÒÑµãÁÁÂÌµÆ");
+	user_led_info("RGBå·²ç‚¹äº®ç»¿ç¯");
 }
 
 void OpenRGB_B(void){
 	HAL_GPIO_WritePin(RGB_B_GPIO_Port, RGB_B_Pin, GPIO_PIN_RESET);
-	user_led_info("RGBÒÑµãÁÁ°×µÆ");
+	user_led_info("RGBå·²ç‚¹äº®ç™½ç¯");
 }
 
 void CloseLED(void){
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-	user_led_info("LEDÒÑÏ¨Ãğ");
+	user_led_info("LEDå·²ç†„ç­");
 }
 
 void CloseRGB_R(void){
 	HAL_GPIO_WritePin(RGB_R_GPIO_Port, RGB_R_Pin, GPIO_PIN_SET);
-	user_led_info("RGBÒÑÏ¨ÃğºìµÆ");
+	user_led_info("RGBå·²ç†„ç­çº¢ç¯");
 }
 
 void CloseRGB_G(void){
 	HAL_GPIO_WritePin(RGB_G_GPIO_Port, RGB_G_Pin, GPIO_PIN_SET);
-	user_led_info("RGBÒÑÏ¨ÃğÂÌµÆ");
+	user_led_info("RGBå·²ç†„ç­ç»¿ç¯");
 }
 
 void CloseRGB_B(void){
 	HAL_GPIO_WritePin(RGB_B_GPIO_Port, RGB_B_Pin, GPIO_PIN_SET);
-	user_led_info("RGBÒÑÏ¨ÃğÀ¶µÆ");
+	user_led_info("RGBå·²ç†„ç­è“ç¯");
 }
 

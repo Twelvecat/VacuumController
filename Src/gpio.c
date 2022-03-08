@@ -84,7 +84,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 //		case KEY_STOP_Pin:
 //		{					
 //			//HAL_Delay(10);
-//			if( HAL_GPIO_ReadPin(KEY_STOP_GPIO_Port, KEY_STOP_Pin)==0) //延时10ms之后再判断是否有按键被按下，防抖
+//			if( HAL_GPIO_ReadPin(KEY_STOP_GPIO_Port, KEY_STOP_Pin)==0) //寤舵椂10ms涔嬪悗鍐嶅垽鏂槸鍚︽湁鎸夐敭琚寜涓嬶紝闃叉姈
 //			{
 //			user_gpio_info("KEY_STOP has been pressed.");
 //			ToggleLED();

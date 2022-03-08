@@ -4,28 +4,28 @@
 struct _pid pid;
 
 void PID_init(struct _pid* pid){
-    pid->SetSpeed=0.0;	//ÉèÖÃµÄÑ¹Á¦
-    pid->ActualSpeed=0.0;//Êµ¼ÊµÄÑ¹Á¦
-    pid->err=0.0;		//Êµ¼ÊÎó²î
-    pid->err_last=0.0;	//ÉÏÒ»´ÎµÄÎó²î
-    pid->voltage=0.0;	//Êä³öÖµ
-    pid->integral=0.0;	//»ý·ÖÖµ
+    pid->SetSpeed=0.0;	//è®¾ç½®çš„åŽ‹åŠ›
+    pid->ActualSpeed=0.0;//å®žé™…çš„åŽ‹åŠ›
+    pid->err=0.0;		//å®žé™…è¯¯å·®
+    pid->err_last=0.0;	//ä¸Šä¸€æ¬¡çš„è¯¯å·®
+    pid->voltage=0.0;	//è¾“å‡ºå€¼
+    pid->integral=0.0;	//ç§¯åˆ†å€¼
 
     pid->Kp=4.67;
     pid->Ki=0.15;
     pid->Kd=0.3;
-    pid->umax=150;		//ÓÃÓÚ»ý·Ö·ÖÀë
+    pid->umax=150;		//ç”¨äºŽç§¯åˆ†åˆ†ç¦»
     pid->umin=-200;
 }
 
 void PID_pos_realize(struct _pid* pid, float speed, float ActualSpeed)
 {
-	int index;//ÓÃÓÚ»ý·Ö·ÖÀë,¼´Í¨¹ý¸ÃÖµÀ´È·¶¨ÊÇ·ñÊ¹ÓÃ»ý·Ö³£Êý
+	int index;//ç”¨äºŽç§¯åˆ†åˆ†ç¦»,å³é€šè¿‡è¯¥å€¼æ¥ç¡®å®šæ˜¯å¦ä½¿ç”¨ç§¯åˆ†å¸¸æ•°
 	pid->SetSpeed=(float)speed;	
-	pid->ActualSpeed=(float)ActualSpeed;//²É¼¯³öÊµ¼ÊÖµ
+	pid->ActualSpeed=(float)ActualSpeed;//é‡‡é›†å‡ºå®žé™…å€¼
 	pid->err=pid->ActualSpeed-pid->SetSpeed;
-	user_pid_info("PID²îÖµÎª:%.2f",pid->err);
-	if(pid->ActualSpeed>pid->SetSpeed+pid->umax)  //ÈôÊµ¼ÊÖµ´óÓÚ×î´óÖµ
+	user_pid_info("PIDå·®å€¼ä¸º:%.2f",pid->err);
+	if(pid->ActualSpeed>pid->SetSpeed+pid->umax)  //è‹¥å®žé™…å€¼å¤§äºŽæœ€å¤§å€¼
 	{index=0;}
 	else if(pid->ActualSpeed<pid->SetSpeed+pid->umin)
 	{index=0;}
@@ -35,7 +35,7 @@ void PID_pos_realize(struct _pid* pid, float speed, float ActualSpeed)
 		pid->integral+=pid->err;
 	}
 	pid->voltage=pid->Kp*pid->err+index*pid->Ki*pid->integral+pid->Kd*(pid->err-pid->err_last);
-	user_pid_info("PIDÀíÂÛÊä³ö:%.2f",pid->voltage);
+	user_pid_info("PIDç†è®ºè¾“å‡º:%.2f",pid->voltage);
 	if(pid->voltage<0)pid->voltage=0;
 	if(pid->voltage>400)pid->voltage=400;
 	pid->err_last=pid->err;

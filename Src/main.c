@@ -96,21 +96,21 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-	user_main_info("GPIO,IIC1/2,USART1/2,TIM2/3/4³õÊ¼»¯Íê³É");
-	user_main_info("°åÔØHP5806³¢ÊÔ³õÊ¼»¯");
+	user_main_info("GPIO,IIC1/2,USART1/2,TIM2/3/4åˆå§‹åŒ–å®Œæˆ");
+	user_main_info("æ¿è½½HP5806å°è¯•åˆå§‹åŒ–");
 	HP5806_Init(&hi2c1,&hp5806_A);
-	user_main_info("ÍâÖÃHP5806³¢ÊÔ³õÊ¼»¯");
+	user_main_info("å¤–ç½®HP5806å°è¯•åˆå§‹åŒ–");
 	HP5806_Init(&hi2c2,&hp5806_B);
-	user_main_info("LEDºÍRGB³¢ÊÔ³õÊ¼»¯");
+	user_main_info("LEDå’ŒRGBå°è¯•åˆå§‹åŒ–");
 	InitLED();
 	InitRGB();
-	user_main_info("Á½Â·¼ÌµçÆ÷³¢ÊÔ³õÊ¼»¯");
+	user_main_info("ä¸¤è·¯ç»§ç”µå™¨å°è¯•åˆå§‹åŒ–");
 	InintRelay();
 	PID_init(&pid);
 	system_init();
-	user_main_info("¶¨Ê±Æ÷3ÖÐ¶Ï¿ªÆô£¬ÖÜÆÚ%.2fHz",72000000.0/(htim3.Instance->ARR+1)/(htim3.Instance->PSC+1));
+	user_main_info("å®šæ—¶å™¨3ä¸­æ–­å¼€å¯ï¼Œå‘¨æœŸ%.2fHz",72000000.0/(htim3.Instance->ARR+1)/(htim3.Instance->PSC+1));
 	HAL_TIM_Base_Start_IT(&htim3);
-	user_main_info("¶¨Ê±Æ÷4ÖÐ¶Ï¿ªÆô£¬ÖÜÆÚ%.2fHz",72000000.0/(htim4.Instance->ARR+1)/(htim4.Instance->PSC+1));
+	user_main_info("å®šæ—¶å™¨4ä¸­æ–­å¼€å¯ï¼Œå‘¨æœŸ%.2fHz",72000000.0/(htim4.Instance->ARR+1)/(htim4.Instance->PSC+1));
 	HAL_TIM_Base_Start_IT(&htim4);
 	HAL_Delay(1000);
 	system_into_operating();

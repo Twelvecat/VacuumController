@@ -4,18 +4,18 @@ void ChangeSpeed(int16_t speed)
 {
 	if(speed<0) speed=0;
 	else if(speed > MAX_SPEED) speed = MAX_SPEED;
-	__HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_2, speed);//ÉèÖÃÕ¼¿Õ±È
-	user_pump_info("ÒÑĞŞ¸Ä±ÃµÄÕ¼¿Õ±ÈÎª%.2f%%",100.0*speed/MAX_SPEED);
+	__HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_2, speed);//è®¾ç½®å ç©ºæ¯”
+	user_pump_info("å·²ä¿®æ”¹æ³µçš„å ç©ºæ¯”ä¸º%.2f%%",100.0*speed/MAX_SPEED);
 }
 
 void OpenPump(void)
 {
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-	user_pump_info("±ÃÒÑ½øÈë×¼±¸×´Ì¬");
+	user_pump_info("æ³µå·²è¿›å…¥å‡†å¤‡çŠ¶æ€");
 }
 
 void ClosePump(void)
 {
-	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);//¹Ø±ÕPWM
-	user_pump_info("±ÃÒÑÍË³ö¹¤×÷×´Ì¬");
+	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);//å…³é—­PWM
+	user_pump_info("æ³µå·²é€€å‡ºå·¥ä½œçŠ¶æ€");
 }

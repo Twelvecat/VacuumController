@@ -4,19 +4,19 @@ void InintRelay(void)
 {
 	CloseRelay(1);
 	CloseRelay(2);
-	user_relay_info("¼ÌµçÆ÷³õÊ¼»¯Íê±Ï");
+	user_relay_info("ç»§ç”µå™¨åˆå§‹åŒ–å®Œæ¯•");
 }
 
 void OpenRelay(uint8_t ID)
 {
 	if(ID == 1)
 	{
-		user_relay_info("¼ÌµçÆ÷1ÒÑ¿ªÆô");
+		user_relay_info("ç»§ç”µå™¨1å·²å¼€å¯");
 		HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
 	}
 	else if(ID == 2)
 	{
-		user_relay_info("¼ÌµçÆ÷2ÒÑ¿ªÆô");
+		user_relay_info("ç»§ç”µå™¨2å·²å¼€å¯");
 		HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_RESET);	
 	}
 }
@@ -25,12 +25,12 @@ void CloseRelay(uint8_t ID)
 {
 	if(ID == 1)
 	{
-		user_relay_info("¼ÌµçÆ÷1ÒÑ¹Ø±Õ");
+		user_relay_info("ç»§ç”µå™¨1å·²å…³é—­");
 		HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
 	}
 	else if(ID == 2)
 	{
-		user_relay_info("¼ÌµçÆ÷2ÒÑ¹Ø±Õ");
+		user_relay_info("ç»§ç”µå™¨2å·²å…³é—­");
 		HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);	
 	}
 }
