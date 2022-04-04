@@ -29,6 +29,7 @@ extern "C" {
 
 /* USER CODE BEGIN Includes */
 #include "key.h"
+#include "work_system.h"
 /* USER CODE END Includes */
 
 extern TIM_HandleTypeDef htim2;

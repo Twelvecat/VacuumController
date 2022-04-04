@@ -9,23 +9,23 @@
 #define HP5806WAddr 	HP5806Addr << 1
 #define HP5806RAddr 	(HP5806Addr << 1) + 1
 
-//å˜æ¢ç³»æ•°ï¼Œä¿®æ”¹è¿‡é‡‡æ ·çŽ‡éœ€è¦é…å¥—ä¿®æ”¹æ­¤å¤„
+//±ä»»ÏµÊý£¬ÐÞ¸Ä¹ý²ÉÑùÂÊÐèÒªÅäÌ×ÐÞ¸Ä´Ë´¦
 #define HP5806_kP	253952
 #define HP5806_kT	524288
 
-//åŽ‹åŠ›æ•°æ®å­˜å‚¨r
+//Ñ¹Á¦Êý¾Ý´æ´¢r
 #define HP5806_PSR_B2	0x00
 #define HP5806_PSR_B1	0x01
 #define HP5806_PSR_B0	0x02
 
-//æ¸©åº¦æ•°æ®å­˜å‚¨r
+//ÎÂ¶ÈÊý¾Ý´æ´¢r
 #define HP5806_TMP_B2	0x03
 #define HP5806_TMP_B1	0x04
 #define HP5806_TMP_B0	0x05
 
-//æµ‹åŽ‹çŽ‡ä¸Žåˆ†è¾¨çŽ‡é…ç½®
+//²âÑ¹ÂÊÓë·Ö±æÂÊÅäÖÃ
 #define HP5806_PRS_CFG	0x06
-	//PM_RATE,PM_PRCéœ€è¦orä½¿ç”¨
+	//PM_RATE,PM_PRCÐèÒªorÊ¹ÓÃ
 		//PM_RATE[6:4]rw
 		#define HP5806_PM_RATE_1	0x00
 		#define HP5806_PM_RATE_2	0x10
@@ -46,9 +46,9 @@
 		#define HP5806_PM_PRC_128	0x07
 		//Reserved[7]
 	
-//æµ‹æ¸©çŽ‡ä¸Žåˆ†è¾¨çŽ‡é…ç½®
+//²âÎÂÂÊÓë·Ö±æÂÊÅäÖÃ
 #define HP5806_TMP_CFG	0x07
-	//TMP_EXT,TMP_RATE,TMP_PRCéœ€è¦orä½¿ç”¨
+	//TMP_EXT,TMP_RATE,TMP_PRCÐèÒªorÊ¹ÓÃ
 		//TMP_EXT[7]rw
 		#define HP5806_TMP_EXT_INTERNAL	0x00
 		#define HP5806_TMP_EXT_EXTERNAL	0x80
@@ -72,9 +72,9 @@
 		#define HP5806_TMP_PRC_128	0x07
 		//Reserved[3]
 	
-//ä¼ æ„Ÿå™¨å·¥ä½œæ¨¡å¼ä¸ŽçŠ¶æ€é…ç½®
+//´«¸ÐÆ÷¹¤×÷Ä£Ê½Óë×´Ì¬ÅäÖÃ
 #define HP5806_MEAS_CFG	0x08
-	//COED_RDY,SENSOR_RDY,TMP_RDY,PRS_RDY,MEAS_CTRLéœ€è¦orä½¿ç”¨
+	//COED_RDY,SENSOR_RDY,TMP_RDY,PRS_RDY,MEAS_CTRLÐèÒªorÊ¹ÓÃ
 		//COED_RDY[7]r
 		#define HP5806_COED_RDY_NO	0x00
 		#define HP5806_COED_RDY_YES	0x80
@@ -96,9 +96,9 @@
 		#define HP5806_MEAS_CTRL_BACKGROUND_PT_CMEASUREMENT	0x07
 		//Reserved[3]
 
-//FIFOé…ç½®
+//FIFOÅäÖÃ
 #define HP5806_CFG_REG	0x09
-	//T_SHIFT,P_SHIFT,FIFO_ENéœ€è¦orä½¿ç”¨
+	//T_SHIFT,P_SHIFT,FIFO_ENÐèÒªorÊ¹ÓÃ
 		//T_SHIFT[3]rw
 		#define HP5806_T_SHIFT_NO	0x00
 		#define HP5806_T_SHIFT_YES	0x08
@@ -110,9 +110,9 @@
 		#define HP5806_FIFO_EN_YES	0x02
 		//Reserved[7:4,0]
 
-//FIFOçŠ¶æ€
+//FIFO×´Ì¬
 #define HP5806_FIFO_STS	0x0B
-	//FIFO_FULL,FIFL_EMPTYéœ€è¦orä½¿ç”¨
+	//FIFO_FULL,FIFL_EMPTYÐèÒªorÊ¹ÓÃ
 		//FIFO_FULL[1]r
 		#define HP5806_FIFO_FULL_NO	0x00
 		#define HP5806_FIFO_FULL_YES	0x02
@@ -121,9 +121,9 @@
 		#define HP5806_FIFL_EMPTY_YES	0x01
 		//Reserved[7:2]
 
-//FIFOåˆ·æ–°å’Œè½¯ä»¶å¤ä½
+//FIFOË¢ÐÂºÍÈí¼þ¸´Î»
 #define HP5806_RESET	0x0C
-	//FIFO_FLUSH,SORT_RSTéœ€è¦orä½¿ç”¨
+	//FIFO_FLUSH,SORT_RSTÐèÒªorÊ¹ÓÃ
 		//FIFO_FLUSH[7]w
 		#define HP5806_FIFO_FLUSH_EMPTY	0x00
 		#define HP5806_FIFO_FLUSH_CLEAR	0x80
@@ -132,15 +132,15 @@
 		//Reserved[6:4]
 
 
-//äº§å“ID
+//²úÆ·ID
 #define HP5806_Product_ID	0x0D
-	//REV_ID,PROD_IDéœ€è¦orä½¿ç”¨
+	//REV_ID,PROD_IDÐèÒªorÊ¹ÓÃ
 		//REV_ID[7:4]r
 		#define HP5806_REV_ID	0x10
 		//PROD_ID[3:0]r
 		#define HP5806_PROD_ID	0x00
 
-//ä¼ æ„Ÿå™¨æ ¡å‡†å‚æ•°r
+//´«¸ÐÆ÷Ð£×¼²ÎÊýr
 #define HP5806_COEF_c0	0x10			//c0[11:4]
 #define HP5806_COEF_c0c1	0x11		//c0[3:0]	c1[11:8]
 #define HP5806_COEF_c1	0x12			//c1[7:0]
@@ -160,7 +160,7 @@
 #define HP5806_COEF_c30H	0x20		//c30[15:8]
 #define HP5806_COEF_c30L	0x21		//c30[7:0]
 
-//æ ¡å‡†ç³»æ•°æº
+//Ð£×¼ÏµÊýÔ´
 #define HP5806_COED_SRCE	0x28
 	//TMP_COEF_SRCE[7]r
 	#define HP5806_TMP_COEF_SRCE_TBD	0x00
@@ -169,31 +169,34 @@
 
 
 struct HP5806{
-		//ä¼ æ„Ÿå™¨æ ¡æ­£ç³»æ•°
+		//´«¸ÐÆ÷Ð£ÕýÏµÊý
     int16_t c0;
-		int16_t c1;
-		int32_t c00;
-		int32_t c10;
-		int16_t c01;
-		int16_t c11;
-		int16_t c20;
-		int16_t c21;
-		int16_t c30;
-		//èŽ·å–å€¼
-		int32_t Traw;
-		int32_t Praw;
-		//è®¡ç®—æ ¡å‡†è¾“å‡ºå€¼
-		float Tcomp;
-		float Pcomp;
-		float	Prawsc;
-		float	Trawsc;
-		//é…ç½®å€¼
-		uint8_t	PRS_CFG;
-		uint8_t	TMP_CFG;
-		uint8_t	CFG_REG;
+	int16_t c1;
+	int32_t c00;
+	int32_t c10;
+	int16_t c01;
+	int16_t c11;
+	int16_t c20;
+	int16_t c21;
+	int16_t c30;
+	//»ñÈ¡Öµ
+	int32_t Traw;
+	int32_t Praw;
+	//¼ÆËãÐ£×¼Êä³öÖµ
+	float Tcomp;
+	float Pcomp;
+	float	Prawsc;
+	float	Trawsc;
+	//ÅäÖÃÖµ
+	uint8_t	PRS_CFG;
+	uint8_t	TMP_CFG;
+	uint8_t	CFG_REG;
+	//ÊôÐÔÖµ
+	uint8_t id; //´«¸ÐÆ÷id 1Îª°åÔØ£¬2ÎªÍâÖÃ
 };             
 
-extern struct HP5806 hp5806_A,hp5806_B;
+extern struct HP5806 hp5806_A;
+extern struct HP5806 hp5806_B;
 
 uint8_t HP5806_WriteByte(I2C_HandleTypeDef *hi2c,uint8_t reg,uint8_t *data);
 uint8_t HP5806_ReadByte(I2C_HandleTypeDef *hi2c,uint8_t reg,uint8_t *buf);
@@ -209,9 +212,8 @@ uint8_t HP5806_Shift(I2C_HandleTypeDef *hi2c,struct HP5806* hp5806,uint8_t buf);
 uint8_t HP5806_Reset(I2C_HandleTypeDef *hi2c);
 uint8_t HP5806_GetTemperature(I2C_HandleTypeDef *hi2c,struct HP5806* hp5806);
 uint8_t HP5806_GetPressure(I2C_HandleTypeDef *hi2c,struct HP5806* hp5806);
-void HP5806_Init(I2C_HandleTypeDef *hi2c,struct HP5806* hp5806);
-void HP5806_B_Run(void);
-void HP5806_A_Run(void);
+void HP5806_Init(I2C_HandleTypeDef *hi2c,struct HP5806* hp5806, uint8_t id);
+void HP5806_run(uint8_t id, struct HP5806* hp5806)
 
 
 #define USER_HP5806_DEBUG

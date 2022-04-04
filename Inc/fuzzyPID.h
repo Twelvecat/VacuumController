@@ -108,7 +108,7 @@ struct PID {
 #define max_error 12.0f
 #define max_delta_error 12.0f
 #endif
-//杩欎釜鍦版柟瑕佹敞鎰忓摝
+//这个地方要注意哦
 #define min_pwm_output 0
 #define middle_pwm_output 500
 #define max_pwm_output 1000

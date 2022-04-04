@@ -33,7 +33,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "hp5806.h"
-#include "led.h"
+#include "rgb.h"
 #include "relay.h"
 #include "pump.h"
 #include "work_system.h"

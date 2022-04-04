@@ -18,20 +18,20 @@
 #endif
 
 struct _pid{
-    float SetSpeed;            	//å®šä¹‰è®¾å®šå€¼
-    float ActualSpeed;        	//å®šä¹‰å®é™…å€¼
-    float err;                	//å®šä¹‰åå·®å€¼
-    float err_last;            	//å®šä¹‰ä¸Šä¸€ä¸ªåå·®å€¼
-    float Kp,Ki,Kd;            	//å®šä¹‰æ¯”ä¾‹ã€ç§¯åˆ†ã€å¾®åˆ†ç³»æ•°
-    float voltage;            	//å®šä¹‰ç”µå‹å€¼ï¼ˆæ§åˆ¶æ‰§è¡Œå™¨çš„å˜é‡ï¼‰
-    float integral;            	//å®šä¹‰ç§¯åˆ†å€¼
-    float umax;									//æ­£é¥±å’Œå€¼
-    float umin;									//è´Ÿé¥±å’Œå€¼
+    float SetSpeed;            	//¶¨ÒåÉè¶¨Öµ
+    float ActualSpeed;        	//¶¨ÒåÊµ¼ÊÖµ
+    float err;                	//¶¨ÒåÆ«²îÖµ
+    float err_last;            	//¶¨ÒåÉÏÒ»¸öÆ«²îÖµ
+    float Kp,Ki,Kd;            	//¶¨Òå±ÈÀı¡¢»ı·Ö¡¢Î¢·ÖÏµÊı
+    float voltage;            	//¶¨ÒåµçÑ¹Öµ£¨¿ØÖÆÖ´ĞĞÆ÷µÄ±äÁ¿£©
+    float integral;            	//¶¨Òå»ı·ÖÖµ
+    float umax;					//Õı±¥ºÍÖµ
+    float umin;					//¸º±¥ºÍÖµ
 };
 
 extern struct _pid pid;
 
 void PID_init(struct _pid* pid);
-void PID_pos_realize(struct _pid* pid, float speed, float ActualSpeed);
+void PID_posRealize(struct _pid* pid, float speed, float ActualSpeed);
 
 #endif /* __PID_H__ */

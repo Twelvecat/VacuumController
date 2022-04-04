@@ -1,36 +1,40 @@
 #include "relay.h"
 
-void InintRelay(void)
+struct _relay relay_A; //´´½¨¼ÌµçÆ÷1
+
+void RELAY_InitRelay(struct _relay *relay, uint8_t id)
 {
-	CloseRelay(1);
-	CloseRelay(2);
-	user_relay_info("ç»§ç”µå™¨åˆå§‹åŒ–å®Œæ¯•");
+	relay->id = id;
+	RELAY_CloseRelay(relay);
+	user_relay_info("¼ÌµçÆ÷³õÊ¼»¯Íê±Ï");
 }
 
-void OpenRelay(uint8_t ID)
+void RELAY_OpenRelay(struct _relay *relay)
 {
-	if(ID == 1)
+	if(relay->id == 1)
 	{
-		user_relay_info("ç»§ç”µå™¨1å·²å¼€å¯");
+		user_relay_info("¼ÌµçÆ÷1ÒÑ¿ªÆô");
 		HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_RESET);
 	}
-	else if(ID == 2)
+	else if(relay->id == 2)
 	{
-		user_relay_info("ç»§ç”µå™¨2å·²å¼€å¯");
+		user_relay_info("¼ÌµçÆ÷2ÒÑ¿ªÆô");
 		HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_RESET);	
 	}
+	relay->status=1;
 }
 
-void CloseRelay(uint8_t ID)
+void RELAY_CloseRelay(struct _relay *relay)
 {
-	if(ID == 1)
+	if(relay->id == 1)
 	{
-		user_relay_info("ç»§ç”µå™¨1å·²å…³é—­");
+		user_relay_info("¼ÌµçÆ÷1ÒÑ¹Ø±Õ");
 		HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin, GPIO_PIN_SET);
 	}
-	else if(ID == 2)
+	else if(relay->id == 2)
 	{
-		user_relay_info("ç»§ç”µå™¨2å·²å…³é—­");
+		user_relay_info("¼ÌµçÆ÷2ÒÑ¹Ø±Õ");
 		HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);	
 	}
+		relay->status=0;
 }

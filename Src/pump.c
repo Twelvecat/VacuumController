@@ -1,21 +1,34 @@
 #include "pump.h"
 
-void ChangeSpeed(int16_t speed)
+struct _pump pump;
+
+
+void PUMP_init(struct _pump *pump)
+{
+	PUMP_openPump(pump);
+	PUMP_changeSpeed(pump, 0);
+	pump->frequency = 72000000.0 / (htim2.Instance->ARR + 1) / (htim2.Instance->PSC + 1);
+}
+
+void PUMP_changeSpeed(struct _pump *pump, int16_t speed)
 {
 	if(speed<0) speed=0;
 	else if(speed > MAX_SPEED) speed = MAX_SPEED;
-	__HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_2, speed);//è®¾ç½®å ç©ºæ¯”
-	user_pump_info("å·²ä¿®æ”¹æ³µçš„å ç©ºæ¯”ä¸º%.2f%%",100.0*speed/MAX_SPEED);
+	__HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_2, speed);//ÉèÖÃÕ¼¿Õ±È
+	pump->pwm = speed*100/MAX_SPEED;
+	user_pump_info("ÒÑĞŞ¸Ä±ÃµÄÕ¼¿Õ±ÈÎª%.2f%%",100.0*speed/MAX_SPEED);
 }
 
-void OpenPump(void)
+void PUMP_openPump(struct _pump *pump)
 {
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-	user_pump_info("æ³µå·²è¿›å…¥å‡†å¤‡çŠ¶æ€");
+	pump->status = 1;
+	user_pump_info("±ÃÒÑ½øÈë×¼±¸×´Ì¬");
 }
 
-void ClosePump(void)
+void PUMP_closePump(struct _pump *pump)
 {
-	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);//å…³é—­PWM
-	user_pump_info("æ³µå·²é€€å‡ºå·¥ä½œçŠ¶æ€");
+	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);//¹Ø±ÕPWM
+	pump->status = 0;
+	user_pump_info("±ÃÒÑÍË³ö¹¤×÷×´Ì¬");
 }

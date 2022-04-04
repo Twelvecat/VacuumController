@@ -3,6 +3,13 @@
         "led.h": "c",
         "main.h": "c",
         "relay.h": "c",
-        "hp5806.h": "c"
+        "hp5806.h": "c",
+        "touch.h": "c",
+        "usart.h": "c",
+        "pid.h": "c",
+        "work_system.h": "c",
+        "pump.h": "c",
+        "fuzzypid.h": "c",
+        "tim.h": "c"
     }
 }

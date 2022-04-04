@@ -190,7 +190,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 /* USER CODE BEGIN 1 */
 int fputc(int ch, FILE *f){
 	uint8_t temp[1] = {ch};
-	HAL_UART_Transmit(&huart2, temp, 1, 2);//huart1éœ€è¦æ ¹æ®ä½ çš„é…ç½®ä¿®æ”¹
+	HAL_UART_Transmit(&huart2, temp, 1, 2);//huart1ĞèÒª¸ù¾İÄãµÄÅäÖÃĞŞ¸Ä
 	return ch;
 }
 

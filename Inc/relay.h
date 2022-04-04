@@ -4,9 +4,16 @@
 #include "main.h"
 #include "usart.h"
 
-void InintRelay(void);
-void OpenRelay(uint8_t ID);
-void CloseRelay(uint8_t ID);
+struct _relay{
+	uint8_t status;            	//继电器的状态: 0为关闭，1为导通
+	uint8_t id;					//继电器的序号: 1为继电器1，2为继电器2
+};
+
+extern struct _relay relay_A; //创建继电器1
+
+void RELAY_InitRelay(struct _relay *relay, uint8_t id);
+void RELAY_OpenRelay(struct _relay *relay);
+void RELAY_CloseRelay(struct _relay *relay);
 
 #define USER_RELAY_DEBUG
 #ifdef USER_RELAY_DEBUG

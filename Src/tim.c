@@ -283,10 +283,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&htim3))
     {
-		HP5806_A_Run();
-		HP5806_B_Run();
-		PID_pos_realize(&pid, 900, hp5806_B.Pcomp/100);
-		ChangeSpeed(pid.voltage);	
+		HP5806_Run(system.hp5806_A);
+    HP5806_Run(system.hp5806_B);
+		PID_posRealize(system.pid, (*system.hp5806_A).Pcomp/100-system.set_value, (*system.hp5806_B).Pcomp/100);
+		PUMP_changeSpeed(system.pump, (*system.pid).voltage);	
     }
 		else if (htim == (&htim4))
     {

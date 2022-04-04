@@ -18,13 +18,21 @@
 #endif
 
 struct _system{
-	uint8_t sys_last_status;					//ä¸Šæ¬¡å·¥ä½œçŠ¶æ€
-    uint8_t sys_status;            	//ç³»ç»Ÿå·¥ä½œçŠ¶æ€ï¼š1-å‡†å¤‡æ€ã€2-è¿è¡Œæ€ã€3-æ•…éšœæ€ã€4-æ€¥åœæ€ã€5-è°ƒè¯•æ€
-    uint8_t pump_status;        	//æ³µå·¥ä½œçŠ¶æ€ï¼š1-å‡†å¤‡æ€ã€2-è¿è¡Œæ€
-		//æœªå®Œå¾…ç»­
+	struct _pump *pump;		//´´½¨Ò»¸ö±Ã
+	struct _pid *pid;		//´´½¨Ò»¸öpid
+	uint8_t pid_mode;			//pidÄ£Ê½£º0Îª»ı·Ö·ÖÀëpid£¬1ÎªÄ£ºıpid
+	struct HP5806 *hp5806_A, *hp5806_B;	//´´½¨ÍâÖÃÓë°åÔØ´«¸ĞÆ÷
+	float set_value; //Éè¶¨¸ºÑ¹
+	struct _relay *relay_A; //´´½¨¼ÌµçÆ÷1
+	struct _rgb *rgb;//´´½¨RGBµÆ
+	uint8_t leak_status;			//Ğ¹Â©±êÖ¾Î»£º0ÎªÎ´Ğ¹Â©£¬1ÎªĞ¹Â©
+	uint8_t wifi_status;			//wifi±êÖ¾Î»£º0ÎªÎ´Á¬½Ó£¬1ÎªÒÑÁ¬½Ó
+	uint8_t sys_last_status;		//ÉÏ´Î¹¤×÷×´Ì¬
+  uint8_t sys_status;            	//ÏµÍ³¹¤×÷×´Ì¬£º1-×¼±¸Ì¬¡¢2-ÔËĞĞÌ¬¡¢3-¹ÊÕÏÌ¬¡¢4-¼±Í£Ì¬¡¢5-µ÷ÊÔÌ¬¡¢6-ÊÖ¶¯Ì¬
 };
 
 extern struct _system system;
+
 
 void system_init(void);
 void system_into_preparedness(void);

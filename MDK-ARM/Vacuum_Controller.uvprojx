@@ -335,7 +335,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>--no-multibyte-chars</MiscControls>
+              <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
               <IncludePath>../Inc;                       ../Drivers/STM32F1xx_HAL_Driver/Inc;                       ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;                       ../Drivers/CMSIS/Device/ST/STM32F1xx/Include;                       ../Drivers/CMSIS/Include</IncludePath>
@@ -406,11 +406,6 @@
               <FileName>fuzzyPID.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\fuzzyPID.c</FilePath>
-            </File>
-            <File>
-              <FileName>led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\led.c</FilePath>
             </File>
             <File>
               <FileName>relay.c</FileName>
@@ -517,6 +512,16 @@
               <FileName>stm32f1xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32f1xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>touch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\touch.c</FilePath>
+            </File>
+            <File>
+              <FileName>rgb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\rgb.c</FilePath>
             </File>
           </Files>
         </Group>

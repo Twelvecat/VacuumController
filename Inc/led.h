@@ -4,17 +4,30 @@
 #include "main.h"
 #include "usart.h"
 
-void InitLED(void);
-void InitRGB(void);
-void OpenLED(void);
-void ToggleLED(void);
+//void LED_Open(void);
+//void LED_Toggle(void);
+//void LED_Close(void);
+//void LED_init(void);
+
+
+
+
+void RGB_Init(struct _rgb *rgb);
+void RGB_Change(struct _rgb *rgb, uint8_t status);
+
 void OpenRGB_R(void);
 void OpenRGB_G(void);
 void OpenRGB_B(void);
-void CloseLED(void);
+
 void CloseRGB_R(void);
 void CloseRGB_G(void);
 void CloseRGB_B(void);
+
+struct _rgb{
+    uint8_t R_status;           //RGB的R状态：0为熄灭，1为开启
+    uint8_t G_status;           //RGB的G状态：0为熄灭，1为开启
+    uint8_t B_status;           //RGB的B状态：0为熄灭，1为开启
+};
 
 #define USER_LED_DEBUG
 #ifdef USER_LED_DEBUG
