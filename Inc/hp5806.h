@@ -213,7 +213,7 @@ uint8_t HP5806_Reset(I2C_HandleTypeDef *hi2c);
 uint8_t HP5806_GetTemperature(I2C_HandleTypeDef *hi2c,struct HP5806* hp5806);
 uint8_t HP5806_GetPressure(I2C_HandleTypeDef *hi2c,struct HP5806* hp5806);
 void HP5806_Init(I2C_HandleTypeDef *hi2c,struct HP5806* hp5806, uint8_t id);
-void HP5806_run(uint8_t id, struct HP5806* hp5806)
+void HP5806_run(struct HP5806* hp5806);
 
 
 #define USER_HP5806_DEBUG

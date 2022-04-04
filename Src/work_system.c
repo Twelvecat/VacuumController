@@ -8,22 +8,22 @@ extern struct _relay relay_A; //创建继电器1
 extern struct _rgb rgb; //创建继电器1
 
 void system_init(void){
-	*system.pump = pump;
+	system.pump = &pump;
 	PUMP_init(system.pump);
-	*system.pid = pid;
+	system.pid = &pid;
 	PID_init(system.pid);
 	system.pid_mode = 0;
-	*system.hp5806_A = hp5806_A;
-	*system.hp5806_B = hp5806_B;
+	system.hp5806_A = &hp5806_A;
+	system.hp5806_B = &hp5806_B;
 	user_worksys_info("板载HP5806尝试初始化");
 	HP5806_Init(&hi2c1, system.hp5806_A, 1);
 	user_worksys_info("外置HP5806尝试初始化");
 	HP5806_Init(&hi2c2, system.hp5806_B, 2);
-	*system.relay_A = relay_A;
+	system.relay_A = &relay_A;
  	user_worksys_info("两路继电器尝试初始化");
 	RELAY_InitRelay(system.relay_A, 1);
 	user_worksys_info("RGB尝试初始化");
-	*system.rgb = rgb;
+	system.rgb = &rgb;
 	RGB_Init(system.rgb);
 
 	system.set_value = 0; 			//设定负压
@@ -66,7 +66,7 @@ void system_into_stop(void){
 void system_into_debug(void){
 	system.sys_last_status=system.sys_status;
 	system.sys_status=5;
-	ChangeSpeed(0);
+	PUMP_changeSpeed(system.pump, 0);
 	PUMP_openPump(system.pump);
 	RGB_Change(system.rgb,0);
 }
