@@ -40,6 +40,7 @@ void system_into_operating(void);
 void system_into_warning(void);
 void system_into_stop(void);
 void system_into_debug(void);
+void system_into_manual(void);
 void system_back(void);
 
 #endif /* __WORK_SYSTEM_H__ */

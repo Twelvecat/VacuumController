@@ -72,37 +72,46 @@ void system_into_debug(void){
 }
 
 void system_into_manual(void){
-	;
+	system.sys_last_status=system.sys_status;
+	system.sys_status=6;
+	PUMP_changeSpeed(system.pump, 0);
+	PUMP_openPump(system.pump);
+	RGB_Change(system.rgb,0);
 }
 
 void system_back(void){
 	switch (system.sys_last_status)
 	{
-	case 1:
-	{
-	system_into_preparedness();
-	break;
-	}
-	case 2:
-	{
-	system_into_operating();
-	break;
-	}
-	case 3:
-	{
-	system_into_warning();
-	break;
-	}
-	case 4:
-	{
-	system_into_stop();
-	break;
-	}
-	case 5:
-	{
-	system_into_debug();
-	break;
-	}
-	default: break;
+		case 1:
+		{
+			system_into_preparedness();
+			break;
+		}
+		case 2:
+		{
+			system_into_operating();
+			break;
+		}
+		case 3:
+		{
+			system_into_warning();
+			break;
+		}
+		case 4:
+		{
+			system_into_stop();
+			break;
+		}
+		case 5:
+		{
+			system_into_debug();
+			break;
+		}
+		case 6:
+		{
+			system_into_manual();
+			break;
+		}
+		default: break;
 	}
 }
