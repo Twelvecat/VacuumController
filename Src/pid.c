@@ -12,11 +12,12 @@ void PID_init(struct _pid *pid)
 	pid->voltage = 0.0;		//输出值
 	pid->integral = 0.0;	//积分值
 
-	pid->Kp = 4.67;
+	pid->Kp = 0.67;
 	pid->Ki = 0.15;
 	pid->Kd = 0.3;
-	pid->umax = 150; //用于积分分离
-	pid->umin = -200;
+	pid->umax = 100; //用于积分分离
+	pid->umin = -100;
+	pid->dead_band = 1.5;
 }
 
 void PID_posRealize(struct _pid *pid, float speed, float ActualSpeed)
@@ -26,6 +27,7 @@ void PID_posRealize(struct _pid *pid, float speed, float ActualSpeed)
 	pid->ActualSpeed = (float)ActualSpeed; //采集出实际值
 	pid->err = pid->ActualSpeed - pid->SetSpeed;
 	user_pid_info("PID差值为:%.2f", pid->err);
+	if( (pid->err < pid->dead_band) && (pid->err > -pid->dead_band) ) pid->err = 0; //添加了死区，避开两个传感器的误差
 	if (pid->ActualSpeed > pid->SetSpeed + pid->umax) //若实际值大于最大值
 	{
 		index = 0;

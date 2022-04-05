@@ -15,7 +15,7 @@ void PUMP_changeSpeed(struct _pump *pump, int16_t speed)
 	if(speed<0) speed=0;
 	else if(speed > MAX_SPEED) speed = MAX_SPEED;
 	__HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_2, speed);//设置占空比
-	pump->pwm = speed*100/MAX_SPEED;
+	pump->pwm = speed*100.0/MAX_SPEED;
 	user_pump_info("已修改泵的占空比为%.2f%%",100.0*speed/MAX_SPEED);
 }
 

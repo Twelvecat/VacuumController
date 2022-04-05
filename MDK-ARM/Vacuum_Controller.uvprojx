@@ -338,7 +338,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                       ../Drivers/STM32F1xx_HAL_Driver/Inc;                       ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;                       ../Drivers/CMSIS/Device/ST/STM32F1xx/Include;                       ../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Inc;                         ../Drivers/STM32F1xx_HAL_Driver/Inc;                         ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;                         ../Drivers/CMSIS/Device/ST/STM32F1xx/Include;                         ../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -428,6 +428,16 @@
               <FilePath>..\Src\work_system.c</FilePath>
             </File>
             <File>
+              <FileName>touch.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\touch.c</FilePath>
+            </File>
+            <File>
+              <FileName>rgb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\rgb.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/main.c</FilePath>
@@ -512,16 +522,6 @@
               <FileName>stm32f1xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32f1xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>touch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\touch.c</FilePath>
-            </File>
-            <File>
-              <FileName>rgb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\rgb.c</FilePath>
             </File>
           </Files>
         </Group>

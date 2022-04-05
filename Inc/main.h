@@ -38,6 +38,7 @@ extern "C" {
 #include "pump.h"
 #include "work_system.h"
 #include "pid.h"
+#include "touch.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

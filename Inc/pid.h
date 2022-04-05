@@ -25,8 +25,9 @@ struct _pid{
     float Kp,Ki,Kd;            	//定义比例、积分、微分系数
     float voltage;            	//定义电压值（控制执行器的变量）
     float integral;            	//定义积分值
-    float umax;					//正饱和值
-    float umin;					//负饱和值
+    float umax;									//正饱和值
+    float umin;									//负饱和值
+		float dead_band;						//死区，单位为百帕
 };
 
 extern struct _pid pid;
