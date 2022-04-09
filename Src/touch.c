@@ -28,9 +28,9 @@ void TOUCH_UpdataHP5806(void)
 
 void TOUCH_UpdataPump(void)
 {
-		TOUCH_variable_write(UIaddr_pumo_status, (uint16_t)system.pump->status);
-		TOUCH_variable_write(UIaddr_pumo_freq, (uint16_t)(system.pump->frequency/100));
-		TOUCH_variable_write(UIaddr_pumo_pwm, (uint16_t)(system.pump->pwm*100));
+		TOUCH_variable_write(UIaddr_pump_status, (uint16_t)system.pump->status);
+		TOUCH_variable_write(UIaddr_pump_freq, (uint16_t)(system.pump->frequency/100));
+		TOUCH_variable_write(UIaddr_pump_pwm, (uint16_t)(system.pump->pwm*100));
 		user_touch_info("PUMP更新完毕");
 }
 
@@ -80,7 +80,8 @@ void TOUCH_curve_write(uint8_t id,uint16_t data)
 	HAL_UART_Transmit(&huart1, buffer_curve_data, 7, 10);
 }
 
-void TOUCH_deal_command(void)
+ //TalNum为当前接收缓存的角标，会循环；CurNum表示当前正在解析的指令角标，通常从StartNum开始计算；StartNum表示该组或下组指令的开始位置
+void TOUCH_extract_command(void)
 {
     uint16_t i,CurNum,tem_TalNum;
     uint8_t CmdBuf[256];
@@ -143,14 +144,14 @@ void TOUCH_deal_command(void)
     ///现在解析指令CmdBuf保存一整条指令
     switch(CmdBuf[3])
     {
-            case 0x81:
-                
-                break;
-            case 0x83:
-                
-                break;
-            default:////命令无效,删除
-                    break;
+			case 0x81:
+					TOUCH_deal_command(CmdBuf);
+					break;
+			case 0x83:
+					TOUCH_deal_command(CmdBuf);
+					break;
+			default:////命令无效,删除
+					break;
     }
     return;
 }
@@ -162,3 +163,62 @@ void TOUCH_deal_command(void)
 //	if(TalNum==BUFFER_SIZE)
 //		TalNum=0;                 
 //}
+
+void TOUCH_deal_command(uint8_t *p_Cmdbuf)
+{
+	uint8_t i=0 ;
+	//uint8_t all_len = p_Cmdbuf[2]+3; 总长度
+	uint8_t data_len = p_Cmdbuf[6];
+	uint16_t command_adds = ((uint16_t)p_Cmdbuf[4] << 8) | ((uint16_t)p_Cmdbuf[5]); //指令地址
+	uint16_t temp_data = 0x0000;
+	user_touch_info("请求处理指令");
+	if(UIaddr_manual_pwm == command_adds)
+	{
+		
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		if(system.sys_status == 6) 
+		{
+			system.output_value = (float)(temp_data/100.0)*(MAX_SPEED/100.0);
+		}
+	}
+	else if(UIaddr_set_value == command_adds)
+	{		
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		system.set_value = (float)(temp_data/10);
+	}	
+	else{
+		for(i=0;i<data_len;i++)
+		{
+			temp_data = ((uint16_t)p_Cmdbuf[7+2*i] << 8) | ((uint16_t)p_Cmdbuf[8+2*i]);
+			TOUCH_run_command(temp_data);
+		}
+	}
+}
+
+void TOUCH_run_command(uint16_t cmd)
+{
+	user_main_info("接收到指令：%x",cmd);
+	switch(cmd)
+    {
+			case 0x0001:
+			{
+					if(system.sys_status!=4)system_into_stop();
+					break;
+			}
+			case 0x0002:
+					if(system.sys_status!=4 && system.sys_status!=6)system_into_manual();
+					else if(system.sys_status==6)	system_back(1);
+					break;
+			case 0x0003:
+				if(system.sys_status!=4 && system.sys_status!=3)system_into_warning();
+				else if(system.sys_status==3)	system_back(1);
+				break;
+			default:////命令无效,删除
+					break;
+    }
+    return;
+}
+/*
+0001：急停
+0002：手动模式
+*/

@@ -21,7 +21,9 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-
+extern uint8_t usart1buff[10];
+extern uint16_t TalNum;
+extern uint8_t CommBuff[BUFFER_SIZE];//定义指令缓冲区
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -113,6 +115,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    /* USART1 interrupt Init */
+    HAL_NVIC_SetPriority(USART1_IRQn, 1, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
   /* USER CODE BEGIN USART1_MspInit 1 */
 
   /* USER CODE END USART1_MspInit 1 */
@@ -140,6 +145,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+    /* USART2 interrupt Init */
+    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART2_IRQn);
   /* USER CODE BEGIN USART2_MspInit 1 */
 
   /* USER CODE END USART2_MspInit 1 */
@@ -163,6 +171,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
 
+    /* USART1 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART1_IRQn);
   /* USER CODE BEGIN USART1_MspDeInit 1 */
 
   /* USER CODE END USART1_MspDeInit 1 */
@@ -181,6 +191,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2|GPIO_PIN_3);
 
+    /* USART2 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART2_IRQn);
   /* USER CODE BEGIN USART2_MspDeInit 1 */
 
   /* USER CODE END USART2_MspDeInit 1 */
@@ -193,6 +205,23 @@ int fputc(int ch, FILE *f){
 	HAL_UART_Transmit(&huart2, temp, 1, 2);//huart1需要根据你的配置修改
 	return ch;
 }
+
+/* USER CODE BEGIN 1 */
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)//自定义中断回调函数
+{
+	//UNUSED(huart);
+	if(huart->Instance==USART1)//如果是串口1
+	{
+//		for(uint8_t i =0;i<9;i++){
+			CommBuff[TalNum++]=usart1buff[0];//保存串口数据
+			if(TalNum==BUFFER_SIZE) TalNum=0;  
+//
+		HAL_UART_Receive_IT(&huart1, usart1buff, 1);
+	}
+
+}
+
 
 /* USER CODE END 1 */
 

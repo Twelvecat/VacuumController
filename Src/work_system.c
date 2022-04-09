@@ -27,22 +27,27 @@ void system_init(void){
 	RGB_Init(system.rgb);
 
 	system.set_value = 0; 			//设定负压
+	system.output_value = 0; //输出值
 	system.leak_status = 0;			//泄漏标志位：0为未泄漏，1为泄漏
 	system.wifi_status = 0;			//wifi标志位：0为未连接，1为已连接
+	system.sys_llast_status = 1;
+	system.sys_last_status = 1;
 	system.sys_status = 1;
 
 	system_into_preparedness();
 }
 
 void system_into_preparedness(void){
+	system.sys_llast_status = system.sys_last_status;
 	system.sys_last_status=system.sys_status;
 	system.sys_status=1;
-	PUMP_changeSpeed(system.pump, 0);
+	system.output_value = 0;
 	PUMP_openPump(system.pump);
 	RGB_Change(system.rgb,1);
 }
 
 void system_into_operating(void){
+	system.sys_llast_status = system.sys_last_status;
 	system.sys_last_status=system.sys_status;
 	system.sys_status=2;
 	PUMP_openPump(system.pump);
@@ -50,6 +55,7 @@ void system_into_operating(void){
 }
 
 void system_into_warning(void){
+	system.sys_llast_status = system.sys_last_status;
 	system.sys_last_status=system.sys_status;
 	system.sys_status=3;
 	PUMP_openPump(system.pump);
@@ -57,30 +63,46 @@ void system_into_warning(void){
 }
 
 void system_into_stop(void){
+	system.sys_llast_status = system.sys_last_status;
 	system.sys_last_status=system.sys_status;
 	system.sys_status=4;
+	system.output_value = 0;
 	PUMP_closePump(system.pump);
 	RGB_Change(system.rgb,4);
 }
 
 void system_into_debug(void){
+	system.sys_llast_status = system.sys_last_status;
 	system.sys_last_status=system.sys_status;
 	system.sys_status=5;
-	PUMP_changeSpeed(system.pump, 0);
+	system.output_value = 0;
 	PUMP_openPump(system.pump);
 	RGB_Change(system.rgb,0);
 }
 
 void system_into_manual(void){
+	system.sys_llast_status = system.sys_last_status;
 	system.sys_last_status=system.sys_status;
 	system.sys_status=6;
-	PUMP_changeSpeed(system.pump, 0);
+	system.output_value = 0;
 	PUMP_openPump(system.pump);
-	RGB_Change(system.rgb,0);
+	RGB_Change(system.rgb,1);
 }
 
-void system_back(void){
-	switch (system.sys_last_status)
+//1:回滚1次，2：回滚2次
+void system_back(uint8_t status){
+	system.sys_status = system.sys_last_status;
+	system.sys_last_status = system.sys_llast_status;
+	if(status==1)
+	{
+		status = system.sys_status;
+	}
+	else if (status == 2 )
+	{
+		status = system.sys_status;
+		system.sys_status = system.sys_last_status;
+	}
+	switch (status)
 	{
 		case 1:
 		{

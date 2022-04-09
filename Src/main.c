@@ -46,6 +46,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uint8_t usart1buff[30];
+uint8_t flag_updata;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -102,6 +104,8 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim3);
   user_main_info("定时器4中断开启，周期%.2fHz", 72000000.0 / (htim4.Instance->ARR + 1) / (htim4.Instance->PSC + 1));
   HAL_TIM_Base_Start_IT(&htim4);
+//	UART_Start_Receive_IT(&huart1, uint8_t *pData, uint16_t Size);
+	HAL_UART_Receive_IT(&huart1, usart1buff, 1);
   HAL_Delay(1000);
   system_into_operating();
 	system.set_value = 50;
@@ -114,7 +118,13 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		TOUCH_UpdataUI();
+		if(flag_updata>2)
+		{
+			TOUCH_UpdataUI();
+			flag_updata=0;
+		}
+		TOUCH_extract_command();
+		PUMP_changeSpeed(system.pump, system.output_value);
   }
   /* USER CODE END 3 */
 }

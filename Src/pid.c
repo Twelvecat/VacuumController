@@ -42,6 +42,8 @@ void PID_posRealize(struct _pid *pid, float speed, float ActualSpeed)
 		pid->integral += pid->err;//这个地方可以再研究研究，取消积分分离后是否需要清空积分状态
 	}
 	pid->voltage = pid->Kp * pid->err + index * pid->Ki * pid->integral + pid->Kd * (pid->err - pid->err_last);
+	if(pid->voltage<0) pid->voltage=0;
+	else if(pid->voltage > MAX_SPEED) pid->voltage = MAX_SPEED;
 	user_pid_info("PID理论输出:%.2f", pid->voltage);
 	pid->err_last = pid->err;
 }

@@ -33,9 +33,9 @@
 #define UIaddr_hp5806_B_temp 0x0088
 #define UIaddr_hp5806_A_temp 0x008C
 
-#define UIaddr_pumo_status 0x0090
-#define UIaddr_pumo_freq 0x0094
-#define UIaddr_pumo_pwm 0x0098
+#define UIaddr_pump_status 0x0090
+#define UIaddr_pump_freq 0x0094
+#define UIaddr_pump_pwm 0x0098
 
 #define UIaddr_pid_p 0x009C
 #define UIaddr_pid_i 0x00A0
@@ -50,6 +50,9 @@
 #define UIaddr_wifi_status 0x00BC
 #define UIaddr_system_status 0x00C0
 
+#define UIaddr_manual_pwm 0x00C4
+#define UIaddr_set_value 0x0826
+
 void TOUCH_variable_write(uint16_t adds, uint16_t data);
 void TOUCH_UpdataUI(void);
 void TOUCH_UpdataHP5806(void);
@@ -58,6 +61,8 @@ void TOUCH_UpdataPID(void);
 void TOUCH_UpdataPres(void);
 void TOUCH_UpdataStatus(void);
 void TOUCH_curve_write(uint8_t id,uint16_t data);
-void TOUCH_deal_command(void);
+void TOUCH_extract_command(void);
+void TOUCH_deal_command(uint8_t *p_Cmdbuf);
+void TOUCH_run_command(uint16_t cmd);
 
 #endif /* __TOUCH_H__ */

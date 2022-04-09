@@ -21,7 +21,7 @@
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
-
+extern uint8_t flag_updata;
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim2;
@@ -286,7 +286,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		HP5806_run(system.hp5806_A);
     HP5806_run(system.hp5806_B);
 		PID_posRealize(system.pid, (*system.hp5806_A).Pcomp/100-system.set_value, (*system.hp5806_B).Pcomp/100);
-		PUMP_changeSpeed(system.pump, (*system.pid).voltage);	
+		if(system.sys_status!=4 && system.sys_status!=6)system.output_value = (*system.pid).voltage;
+		flag_updata++;
     }
 		else if (htim == (&htim4))
     {
@@ -302,7 +303,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				case 2:
 				{
 				if(system.sys_status!=4)system_into_stop();
-				else system_back();
+				else if(system.sys_last_status == 6)system_back(2);
+				else system_back(1);
 				break;
 				}
 				default: break;
