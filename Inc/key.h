@@ -4,7 +4,7 @@
 #include "main.h"
 
 
-#define USER_KEY_DEBUG
+//#define USER_KEY_DEBUG
 #ifdef USER_KEY_DEBUG
 	#define user_key_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_key_info(format, ...) printf("[\tkey]info:" format "\r\n", ##__VA_ARGS__)

@@ -22,6 +22,7 @@
 
 /* USER CODE BEGIN 0 */
 extern uint8_t flag_updata;
+extern uint8_t flag_leak;
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim2;
@@ -288,6 +289,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		PID_posRealize(system.pid, (*system.hp5806_A).Pcomp/100-system.set_value, (*system.hp5806_B).Pcomp/100);
 		if(system.sys_status!=4 && system.sys_status!=6)system.output_value = (*system.pid).voltage;
 		flag_updata++;
+		flag_leak++;
     }
 		else if (htim == (&htim4))
     {

@@ -15,7 +15,7 @@ void RELAY_InitRelay(struct _relay *relay, uint8_t id);
 void RELAY_OpenRelay(struct _relay *relay);
 void RELAY_CloseRelay(struct _relay *relay);
 
-#define USER_RELAY_DEBUG
+//#define USER_RELAY_DEBUG
 #ifdef USER_RELAY_DEBUG
 	#define user_relay_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_relay_info(format, ...) printf("[\trelay]info:" format "\r\n", ##__VA_ARGS__)

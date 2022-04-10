@@ -4,7 +4,7 @@
 #include "main.h"
 
 
-#define USER_WORK_SYSTEM_DEBUG
+//#define USER_WORK_SYSTEM_DEBUG
 #ifdef USER_WORK_SYSTEM_DEBUG
 	#define user_worksys_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_worksys_info(format, ...) printf("[\tworksys]info:" format "\r\n", ##__VA_ARGS__)

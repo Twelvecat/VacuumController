@@ -4,7 +4,7 @@
 #include "main.h"
 #include "math.h"
 
-#define USER_PID_DEBUG
+//#define USER_PID_DEBUG
 #ifdef USER_PID_DEBUG
 	#define user_pid_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_pid_info(format, ...) printf("[\tpid]info:" format "\r\n", ##__VA_ARGS__)

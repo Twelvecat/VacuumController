@@ -22,6 +22,8 @@ void PUMP_changeSpeed(struct _pump *pump, int16_t speed)
 		pump->pwm = temp;
 		user_pump_info("已修改泵的占空比为%.2f%%",temp);
 	}
+	if(speed == MAX_SPEED) leak_timer_start_flag = 1;
+	else leak_timer_start_flag = 0;
 }
 
 void PUMP_openPump(struct _pump *pump)

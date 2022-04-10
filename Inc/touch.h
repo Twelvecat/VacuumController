@@ -4,7 +4,7 @@
 #include "usart.h"
 #include "main.h"
 
-#define USER_TOUCH_DEBUG
+//#define USER_TOUCH_DEBUG
 #ifdef USER_TOUCH_DEBUG
 	#define user_touch_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_touch_info(format, ...) printf("[\ttouch]info:" format "\r\n", ##__VA_ARGS__)

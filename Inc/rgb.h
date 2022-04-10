@@ -23,7 +23,7 @@ extern struct _rgb rgb;//´´½¨RGBµÆ
 void RGB_Init(struct _rgb *rgb);
 void RGB_Change(struct _rgb *rgb, uint8_t status);
 
-#define USER_RGB_DEBUG
+//#define USER_RGB_DEBUG
 #ifdef USER_RGB_DEBUG
 	#define user_rgb_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_rgb_info(format, ...) printf("[\trgb]info:" format "\r\n", ##__VA_ARGS__)

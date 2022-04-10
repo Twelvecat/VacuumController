@@ -48,6 +48,7 @@
 /* USER CODE BEGIN PV */
 uint8_t usart1buff[30];
 uint8_t flag_updata;
+uint8_t flag_leak;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -122,6 +123,11 @@ int main(void)
 		{
 			TOUCH_UpdataUI();
 			flag_updata=0;
+		}
+		if(flag_leak > 5)
+		{
+			LEAK_cheack();
+			flag_leak = 0;
 		}
 		TOUCH_extract_command();
 		PUMP_changeSpeed(system.pump, system.output_value);

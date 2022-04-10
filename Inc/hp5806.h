@@ -216,7 +216,7 @@ void HP5806_Init(I2C_HandleTypeDef *hi2c,struct HP5806* hp5806, uint8_t id);
 void HP5806_run(struct HP5806* hp5806);
 
 
-#define USER_HP5806_DEBUG
+//#define USER_HP5806_DEBUG
 #ifdef USER_HP5806_DEBUG
 	#define user_hp5806_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_hp5806_info(format, ...) printf("[\thp5806]info:" format "\r\n", ##__VA_ARGS__)

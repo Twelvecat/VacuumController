@@ -20,7 +20,7 @@ void PUMP_openPump(struct _pump *pump);
 void PUMP_closePump(struct _pump *pump);
 void PUMP_init(struct _pump *pump);
 
-#define USER_PUMP_DEBUG
+//#define USER_PUMP_DEBUG
 #ifdef USER_PUMP_DEBUG
 	#define user_pump_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_pump_info(format, ...) printf("[\tpump]info:" format "\r\n", ##__VA_ARGS__)
