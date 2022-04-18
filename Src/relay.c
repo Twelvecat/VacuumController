@@ -1,6 +1,6 @@
 #include "relay.h"
 
-struct _relay relay_A; //创建继电器1
+struct _relay relay_A,relay_B; //创建继电器1
 
 void RELAY_InitRelay(struct _relay *relay, uint8_t id)
 {
@@ -36,5 +36,17 @@ void RELAY_CloseRelay(struct _relay *relay)
 		user_relay_info("继电器2已关闭");
 		HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin, GPIO_PIN_SET);	
 	}
-		relay->status=0;
+	relay->status=0;
+}
+
+void RELAY_run(struct _relay *relay)
+{
+	if(relay->status == 1)
+	{
+		RELAY_OpenRelay(relay);
+	}
+	else if(relay->status == 0)
+	{
+		RELAY_CloseRelay(relay);
+	}
 }

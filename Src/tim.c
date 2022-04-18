@@ -21,8 +21,12 @@
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
-extern uint8_t flag_updata;
-extern uint8_t flag_leak;
+extern uint8_t count_updata;
+extern uint8_t count_leak;
+extern uint8_t count_time;
+extern uint8_t count_hp5806;
+extern uint8_t count_pid;
+struct _time time;
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim2;
@@ -280,16 +284,52 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
+void TIM_TimeInit(struct _time *time)
+{
+	time->flag_time = 0;
+	time->hour = 0;
+	time->min = 0;
+	time->sec = 0;
+	time->setting_sec = -1;
+	time->remainder_sec = 0;
+}
+
+void TIM_TimeExit(struct _time *time)
+{
+	time->flag_time = 0;
+	time->hour = 0;
+	time->min = 0;
+	time->sec = 0;
+	time->remainder_sec = 0;
+}
+
+void TIM_run(struct _time *time)
+{
+	if(time->flag_time == 1){
+		time->sec += 1;
+		if(time->sec >= 60){
+			time->min += 1;
+			if(time->min >= 60){
+				time->hour += 1;
+				if(time->hour>9999)
+					time->hour=0;
+			}
+		}
+		if(time->setting_sec == -1) time->remainder_sec = -1;
+		else if(time->remainder_sec > 0  && system.system_status->current == 4)time->remainder_sec = time->remainder_sec-1;
+		else if(time->remainder_sec == 0  && system.system_status->current == 4)system_manual_finish();
+	}
+}
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if (htim == (&htim3))
     {
-		HP5806_run(system.hp5806_A);
-    HP5806_run(system.hp5806_B);
-		PID_posRealize(system.pid, (*system.hp5806_A).Pcomp/100-system.set_value, (*system.hp5806_B).Pcomp/100);
-		if(system.sys_status!=4 && system.sys_status!=6)system.output_value = (*system.pid).voltage;
-		flag_updata++;
-		flag_leak++;
+		count_hp5806++;
+		count_pid++;
+		count_updata++;
+		count_leak++;
+		count_time++;
     }
 		else if (htim == (&htim4))
     {
@@ -299,14 +339,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				{
 				case 1:
 				{
-				if(system.sys_status!=4)system_into_stop();
+				if(system.system_status->current!=6)system_into_stop();
 				break;
 				}
 				case 2:
 				{
-				if(system.sys_status!=4)system_into_stop();
-				else if(system.sys_last_status == 6)system_back(2);
-				else system_back(1);
+				if(system.system_status->current!=6)system_into_stop();
+				else system_StatusBack(system.system_status);
 				break;
 				}
 				default: break;

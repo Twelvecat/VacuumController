@@ -47,8 +47,11 @@
 
 /* USER CODE BEGIN PV */
 uint8_t usart1buff[30];
-uint8_t flag_updata;
-uint8_t flag_leak;
+uint8_t count_updata;
+uint8_t count_leak;
+uint8_t count_time;
+uint8_t count_hp5806;
+uint8_t count_pid;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,7 +62,58 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void Monitor_modifications(void)
+{
+	//继电器模块
+	RELAY_run(system.relay_A);
+	RELAY_run(system.relay_B);
+	if(count_time>=5)
+	{//时间模块
+		count_time=0;
+		TIM_run(system.time);
+		TOUCH_curve_write();
+	}
+	if(count_leak >= 5)
+	{//泄漏监测
+		count_leak = 0;
+		LEAK_cheack();
+	}
+	if(count_updata>2)
+	{//屏幕更新模块
+		TOUCH_UpdataUI();
+		count_updata=0;
+	}
+	if(count_hp5806>1)
+	{//气压传感器模块
+		count_hp5806=0;
+		HP5806_run(system.hp5806_A);
+    HP5806_run(system.hp5806_B);
+	}
+	if(count_pid>1)
+	{//pid模块
+		count_pid=0;
+		if(system.system_status->current == 2)
+		{
+			PID_posRealize(system.pid, (*system.hp5806_A).Pcomp/100-system.set_value, (*system.hp5806_B).Pcomp/100);
+			system.output_value = (*system.pid).voltage;
+		}
+	}
+	if(system.system_status->current == 4)
+	{//手动输出介入
+		system.output_value = system.output_manual;
+	}
+	
+	
+	
+	
+	
 
+	
+	
+	
+
+	system_status_run();
+}
 /* USER CODE END 0 */
 
 /**
@@ -107,9 +161,8 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim4);
 //	UART_Start_Receive_IT(&huart1, uint8_t *pData, uint16_t Size);
 	HAL_UART_Receive_IT(&huart1, usart1buff, 1);
-  HAL_Delay(1000);
-  system_into_operating();
-	system.set_value = 50;
+	TOUCH_Reste();
+  HAL_Delay(2000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -119,17 +172,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		if(flag_updata>2)
-		{
-			TOUCH_UpdataUI();
-			flag_updata=0;
-		}
-		if(flag_leak > 5)
-		{
-			LEAK_cheack();
-			flag_leak = 0;
-		}
+
+
 		TOUCH_extract_command();
+		Monitor_modifications();
 		PUMP_changeSpeed(system.pump, system.output_value);
   }
   /* USER CODE END 3 */

@@ -37,7 +37,18 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN Private defines */
-
+struct _time{
+	uint8_t flag_time;
+	uint16_t hour; 
+	uint8_t min;	
+	uint8_t sec; 
+	int16_t setting_sec; 
+	int16_t remainder_sec; 
+};
+extern struct _time time;
+void TIM_TimeInit(struct _time *time);
+void TIM_TimeExit(struct _time *time);
+void TIM_run(struct _time *time);
 /* USER CODE END Private defines */
 
 void MX_TIM2_Init(void);

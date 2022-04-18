@@ -21,7 +21,7 @@ void LEAK_cheack(void){
 			leak_current=0;
 			float temp1 = leak_value[9]-system.set_value;
 			if(temp1> -10 && temp1 <10) return;
-			else system_into_warning();
+			else ;//Â©ÆøÁË
 		}
 		else{
 			float temp2 = leak_value[leak_current-2] - leak_value[leak_current-1];

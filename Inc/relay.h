@@ -9,11 +9,12 @@ struct _relay{
 	uint8_t id;					//继电器的序号: 1为继电器1，2为继电器2
 };
 
-extern struct _relay relay_A; //创建继电器1
+extern struct _relay relay_A,relay_B; //创建继电器1
 
 void RELAY_InitRelay(struct _relay *relay, uint8_t id);
 void RELAY_OpenRelay(struct _relay *relay);
 void RELAY_CloseRelay(struct _relay *relay);
+void RELAY_run(struct _relay *relay);
 
 //#define USER_RELAY_DEBUG
 #ifdef USER_RELAY_DEBUG
