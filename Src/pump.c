@@ -22,13 +22,13 @@ void PUMP_changeSpeed(struct _pump *pump, int16_t speed)
 		pump->pwm = temp;
 		user_pump_info("已修改泵的占空比为%.2f%%",temp);
 		if(speed != 0)TOUCH_variable_write(UIaddr_pump_status, UIaddr_pump_on);
-		else if(system.system_status->current == 6) TOUCH_variable_write(UIaddr_pump_status, UIaddr_pump_stop);
+		else if(MCUsystem.system_status->current == 6) TOUCH_variable_write(UIaddr_pump_status, UIaddr_pump_stop);
 		else TOUCH_variable_write(UIaddr_pump_status, UIaddr_pump_off);
 	}
 	if(speed == MAX_SPEED) leak_timer_start_flag = 1;
 	else leak_timer_start_flag = 0;
 	
-	if(system.system_status->current == 6 && flag_pump_stop == 1) 
+	if(MCUsystem.system_status->current == 6 && flag_pump_stop == 1) 
 	{
 		TOUCH_variable_write(UIaddr_pump_status, UIaddr_pump_stop);
 		flag_pump_stop = 0;

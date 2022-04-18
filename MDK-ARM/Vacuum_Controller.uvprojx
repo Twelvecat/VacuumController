@@ -528,6 +528,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\leak.c</FilePath>
             </File>
+            <File>
+              <FileName>HeapStrcut.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\HeapStrcut.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

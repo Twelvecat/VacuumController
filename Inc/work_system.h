@@ -42,7 +42,7 @@ struct _system{
 	uint8_t wifi_status;			//wifi标志位：0为未连接，1为已连接
 };
 
-extern struct _system system;
+extern struct _system MCUsystem;
 extern uint8_t flag_pump_stop;
 
 void system_init(void);

@@ -23,7 +23,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
+#include "HeapStrcut.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -52,6 +52,8 @@ uint8_t count_leak;
 uint8_t count_time;
 uint8_t count_hp5806;
 uint8_t count_pid;
+uint8_t flag_proccess_event;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,12 +67,12 @@ void SystemClock_Config(void);
 void Monitor_modifications(void)
 {
 	//继电器模块
-	RELAY_run(system.relay_A);
-	RELAY_run(system.relay_B);
+	RELAY_run(MCUsystem.relay_A);
+	RELAY_run(MCUsystem.relay_B);
 	if(count_time>=5)
 	{//时间模块
 		count_time=0;
-		TIM_run(system.time);
+		TIM_run(MCUsystem.time);
 		TOUCH_curve_write();
 	}
 	if(count_leak >= 5)
@@ -86,33 +88,36 @@ void Monitor_modifications(void)
 	if(count_hp5806>1)
 	{//气压传感器模块
 		count_hp5806=0;
-		HP5806_run(system.hp5806_A);
-    HP5806_run(system.hp5806_B);
+		HP5806_run(MCUsystem.hp5806_A);
+    HP5806_run(MCUsystem.hp5806_B);
 	}
 	if(count_pid>1)
 	{//pid模块
 		count_pid=0;
-		if(system.system_status->current == 2)
+		if(MCUsystem.system_status->current == 2)
 		{
-			PID_posRealize(system.pid, (*system.hp5806_A).Pcomp/100-system.set_value, (*system.hp5806_B).Pcomp/100);
-			system.output_value = (*system.pid).voltage;
+			PID_posRealize(MCUsystem.pid, (*MCUsystem.hp5806_A).Pcomp/100-MCUsystem.set_value, (*MCUsystem.hp5806_B).Pcomp/100);
+			MCUsystem.output_value = (*MCUsystem.pid).voltage;
 		}
 	}
-	if(system.system_status->current == 4)
+	if(MCUsystem.system_status->current == 4)
 	{//手动输出介入
-		system.output_value = system.output_manual;
+		MCUsystem.output_value = MCUsystem.output_manual;
 	}
-	
-	
-	
-	
-	
-
-	
-	
-	
-
 	system_status_run();
+}
+
+void process_safe_event(PriorityQueue *pq)
+{
+	SafeEvent *currentSafeEvent;
+	if(HEAP_is_empty(pq))
+	{
+		flag_proccess_event = 0;//无待处理的事件
+		return;
+	}
+	flag_proccess_event = 1;//有待处理的事件
+	HEAP_find_max(pq, currentSafeEvent);
+	//此处解析事件
 }
 /* USER CODE END 0 */
 
@@ -153,6 +158,7 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(1000); //需要给传感器上电进入状态一些时间，不然板载传感器会测不准
+	safe_event_pq = HEAP_init(10); //容量为10的安全事件优先队列
 	system_init();
   user_main_info("GPIO,IIC1/2,USART1/2,TIM2/3/4初始化完成");
   user_main_info("定时器3中断开启，周期%.2fHz", 72000000.0 / (htim3.Instance->ARR + 1) / (htim3.Instance->PSC + 1));
@@ -176,7 +182,8 @@ int main(void)
 
 		TOUCH_extract_command();
 		Monitor_modifications();
-		PUMP_changeSpeed(system.pump, system.output_value);
+		process_safe_event(safe_event_pq);
+		PUMP_changeSpeed(MCUsystem.pump, MCUsystem.output_value);
   }
   /* USER CODE END 3 */
 }

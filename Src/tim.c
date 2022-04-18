@@ -316,8 +316,8 @@ void TIM_run(struct _time *time)
 			}
 		}
 		if(time->setting_sec == -1) time->remainder_sec = -1;
-		else if(time->remainder_sec > 0  && system.system_status->current == 4)time->remainder_sec = time->remainder_sec-1;
-		else if(time->remainder_sec == 0  && system.system_status->current == 4)system_manual_finish();
+		else if(time->remainder_sec > 0  && MCUsystem.system_status->current == 4)time->remainder_sec = time->remainder_sec-1;
+		else if(time->remainder_sec == 0  && MCUsystem.system_status->current == 4)system_manual_finish();
 	}
 }
 
@@ -339,13 +339,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				{
 				case 1:
 				{
-				if(system.system_status->current!=6)system_into_stop();
+				if(MCUsystem.system_status->current!=6)system_into_stop();
 				break;
 				}
 				case 2:
 				{
-				if(system.system_status->current!=6)system_into_stop();
-				else system_StatusBack(system.system_status);
+				if(MCUsystem.system_status->current!=6)system_into_stop();
+				else system_StatusBack(MCUsystem.system_status);
 				break;
 				}
 				default: break;
