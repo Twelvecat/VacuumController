@@ -279,7 +279,12 @@ void TOUCH_deal_command(uint8_t *p_Cmdbuf)
 	else if(UIaddr_stop == command_adds)
 	{//终止情况
 		system_StatusSwitch(system.system_status, 1);
-	}	
+	}
+	else if(UIaddr_reset == command_adds)
+	{//终止情况
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		if(temp_data == 0x0001) system_MCUreset();
+	}		
 	else{
 		for(i=0;i<data_len;i++)
 		{

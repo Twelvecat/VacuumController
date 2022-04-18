@@ -74,6 +74,8 @@
 // ÊÖ¶¯PWM
 #define UIaddr_manual_pwm 0x0039
 
+// ÉèÖÃ°å¿é
+#define UIaddr_reset 0x0023
 
 #define UIaddr_pump_freq 0x0094
 #define UIaddr_pump_pwm 0x0098

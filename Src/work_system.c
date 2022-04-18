@@ -200,3 +200,9 @@ void system_manual_finish(void)
 	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
 	system_StatusSwitch(system.system_status, 1);
 }
+
+void system_MCUreset(void)
+{
+	__set_FAULTMASK(1); //πÿ÷–∂œ
+	NVIC_SystemReset(); //∏¥Œª   
+}
