@@ -11,17 +11,27 @@
 uint8_t leak_timer_start_flag = 0;
 float leak_value[10] = {0};
 uint8_t leak_current = 0;
+extern uint8_t event_flag;
 
 void LEAK_cheack(void){
-	if (leak_timer_start_flag){
+	if (leak_timer_start_flag  && MCUsystem.system_status->current == 2){
 		leak_value[leak_current++] = (MCUsystem.hp5806_B->Pcomp/100.0);
 		if(leak_current==1) return;
 		else if(leak_current==10) 
 		{
 			leak_current=0;
-			float temp1 = leak_value[9]-MCUsystem.set_value;
+			float temp1 = MCUsystem.hp5806_A->Pcomp/100.0 - leak_value[9]-MCUsystem.set_value;
 			if(temp1> -10 && temp1 <10) return;
-			else ;//漏气了
+			else{//添加泄漏事件
+				if((event_flag&0x10)  == 0){
+					SafeEvent Event;
+					Event.priority = 2;
+					Event.data = 0x05;
+					HEAP_push(Event, safe_event_pq);
+					event_flag = event_flag|0x10;
+					user_heap_info("event_flag:%x", event_flag);
+				}
+			}
 		}
 		else{
 			float temp2 = leak_value[leak_current-2] - leak_value[leak_current-1];

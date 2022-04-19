@@ -8,6 +8,10 @@ extern struct _time time;
 extern struct HP5806 hp5806_A, hp5806_B;	//创建外置与板载传感器
 extern struct _relay relay_A,relay_B; //创建继电器1
 extern struct _rgb rgb; //创建继电器1
+extern uint8_t current_proccess_event;
+extern uint8_t flag_proccess_event;
+extern uint8_t event_flag;
+
 uint8_t flag_pump_stop = 0;
 
 void system_init(void){
@@ -46,15 +50,15 @@ void system_init(void){
 	
 
 
-	system_into_prep();
+	//system_into_prep();
 }
 
 void system_StatusInit(struct _system_status *system_status)
 {
-	system_status->current = 0;
-	system_status->last  = 0;
-	system_status->last_2 = 0;
-	system_status->flag_change = 0;
+	system_status->current = 1;
+	system_status->last  = 1;
+	system_status->last_2 = 1;
+	system_status->flag_change = 1;
 }
 
 void system_StatusSwitch(struct _system_status *system_status, uint8_t status)
@@ -71,15 +75,25 @@ void system_StatusSwitch(struct _system_status *system_status, uint8_t status)
 
 void system_StatusBack(struct _system_status *system_status)
 {//用于急停退出，进入准备态
+	SafeEvent Event;
 	system_status->current = system_status->last;
 	system_status->last = system_status->last_2;
 	system_StatusSwitch(MCUsystem.system_status, 1);
 	system_status->flag_change = 1;
 	TOUCH_variable_write(UIaddr_pump_status, UIaddr_pump_off);
-	uint8_t buffer_registor_data[7] = {USER_R3, USER_RA, 0x04, registor_write, 0x03, 0x00, 0x03};//急停后进入最初页面
-	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
-	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
-	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
+	
+	while(HEAP_is_empty(safe_event_pq) == 0){
+		HEAP_pop(safe_event_pq,&Event);
+		if(Event.data == 0x01)event_flag = event_flag&0xFE;
+		else if(Event.data == 0x02)event_flag = event_flag&0xFD;
+		else if(Event.data == 0x03)event_flag = event_flag&0xFB;
+		else if(Event.data == 0x04)event_flag = event_flag&0xF7;
+		else if(Event.data == 0x05)event_flag = event_flag&0xEF;
+	}
+	current_proccess_event = 0x00;//无待处理的事件
+	flag_proccess_event = 0;
+
+	TOUCH_change_page(0x0003);
 }
 
 void system_status_run(void)
@@ -181,10 +195,9 @@ void system_into_stop(void){
 	RGB_Change(MCUsystem.rgb,4);
 	TIM_TimeExit(MCUsystem.time);
 	flag_pump_stop = 1;
-	uint8_t buffer_registor_data[7] = {USER_R3, USER_RA, 0x04, registor_write, 0x03, 0x00, 0x20};//记得修改
-	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
-	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
-	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
+	TOUCH_change_page(0x002E);
+	TOUCH_change_page(0x002E);
+	TOUCH_change_page(0x002E);
 }
 
 
@@ -196,9 +209,57 @@ void system_into_setting(void){
 
 void system_manual_finish(void)
 {
-	uint8_t buffer_registor_data[7] = {USER_R3, USER_RA, 0x04, registor_write, 0x03, 0x00, 0x14};
-	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
+	TOUCH_change_page(0x0014);
 	system_StatusSwitch(MCUsystem.system_status, 1);
+}
+
+
+void system_know_warring(void)
+{
+	SafeEvent Event;
+	if(MCUsystem.system_status->current == 1)
+	{
+		RGB_Change(MCUsystem.rgb,1);
+		TOUCH_change_page(0x0003);
+	}
+	else if(MCUsystem.system_status->current == 2)
+	{
+		RGB_Change(MCUsystem.rgb,2);
+		TOUCH_change_page(0x0004);
+	}
+	else if(MCUsystem.system_status->current == 3)
+	{
+		RGB_Change(MCUsystem.rgb,1);
+		TOUCH_change_page(0x0005);
+	}
+	else if(MCUsystem.system_status->current == 4)
+	{
+		RGB_Change(MCUsystem.rgb,2);
+		TOUCH_change_page(0x0015);
+	}
+	else if(MCUsystem.system_status->current == 5)
+	{
+		RGB_Change(MCUsystem.rgb,1);
+		TOUCH_change_page(0x0016);
+	}
+	else if(MCUsystem.system_status->current == 6)
+	{
+		RGB_Change(MCUsystem.rgb,4);
+		TOUCH_change_page(0x002E);
+	}
+	else
+	{
+		RGB_Change(MCUsystem.rgb,1);
+		TOUCH_change_page(0x0003);
+	}
+	current_proccess_event = 0x00;
+	flag_proccess_event = 0;
+	HEAP_pop(safe_event_pq,&Event);
+	if(Event.data == 0x01)event_flag = event_flag&0xFE;
+	else if(Event.data == 0x02)event_flag = event_flag&0xFD;
+	else if(Event.data == 0x03)event_flag = event_flag&0xFB;
+	else if(Event.data == 0x04)event_flag = event_flag&0xF7;
+	else if(Event.data == 0x05)event_flag = event_flag&0xEF;
 }
 
 void system_MCUreset(void)

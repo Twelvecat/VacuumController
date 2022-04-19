@@ -1,7 +1,7 @@
 #include "hp5806.h"
 
 struct HP5806 hp5806_A, hp5806_B;
-
+extern uint8_t event_flag;
 
 /*****************************************************************************
  * 功  能：传感器测量温度及气压
@@ -25,6 +25,40 @@ void HP5806_run(struct HP5806* hp5806)
 		user_hp5806_info("开始测量外置HP5806气压");
 		HP5806_GetPressure(&hi2c2, hp5806);
 	}
+	/*以下为安全检测*/
+	if(hp5806->Pcomp/100.0<600 && ((event_flag&0x08)  == 0x00)){
+		SafeEvent Event;
+		Event.priority = 5;
+		Event.data = 0x04;
+		HEAP_push(Event, safe_event_pq);
+		event_flag = event_flag|0x08;
+		user_heap_info("event_flag:%x", event_flag);
+	}
+	else if(hp5806->Pcomp/100.0>1100 && ((event_flag&0x04)  == 0x00)){
+		SafeEvent Event;
+		Event.priority = 4;
+		Event.data = 0x03;
+		HEAP_push(Event, safe_event_pq);
+		event_flag = event_flag|0x04;
+		user_heap_info("event_flag:%x", event_flag);
+	}
+	
+	if(hp5806->Tcomp < -15 && ((event_flag&0x02)  == 0x00)){
+		SafeEvent Event;
+		Event.priority = 1;
+		Event.data = 0x02;
+		HEAP_push(Event, safe_event_pq);
+		event_flag = event_flag|0x02;
+		user_heap_info("event_flag:%x", event_flag);
+	}
+	else if(hp5806->Tcomp > 50 && ((event_flag&0x01)  == 0x00)){
+		SafeEvent Event;
+		Event.priority = 1;
+		Event.data = 0x01;
+		HEAP_push(Event, safe_event_pq);
+		event_flag = event_flag|0x01;
+		user_heap_info("event_flag:%x", event_flag);
+	}	
 }
 
 

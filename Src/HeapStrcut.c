@@ -70,6 +70,8 @@ int HEAP_push(Type value, PriorityQueue *pq){
 		pq->eles[i] = pq->eles[i/2];
 	} 
 	pq->eles[i] = value; //将value放到最后的空穴中 
+//	user_heap_info("value: priority:%d data:%d addr:%x addr_p:%x addr_d:%x;",value.priority,value.data,&value,&value.priority,&value.data);
+//  user_heap_info("pq->eles[i]: priority:%d data:%d addr:%x addr_p:%x addr_d:%x;",pq->eles[i].priority,pq->eles[i].data,&pq->eles[i],&pq->eles[i].priority,&pq->eles[i].data);
 	pq->size ++;
 	return 1;	
 }

@@ -40,6 +40,7 @@ extern "C" {
 #include "pid.h"
 #include "touch.h"
 #include "leak.h"
+#include "HeapStrcut.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -81,7 +82,7 @@ void Error_Handler(void);
 #define LED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
-//#define USER_MAIN_DEBUG
+#define USER_MAIN_DEBUG
 #ifdef USER_MAIN_DEBUG
 	#define user_main_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_main_info(format, ...) printf("[\tmain]info:" format "\r\n", ##__VA_ARGS__)

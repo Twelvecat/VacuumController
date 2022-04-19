@@ -61,5 +61,6 @@ void system_into_stop(void);
 void system_into_setting(void);
 void system_manual_finish(void);
 void system_MCUreset(void);
+void system_know_warring(void);
 
 #endif /* __WORK_SYSTEM_H__ */

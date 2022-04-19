@@ -144,7 +144,13 @@ void TOUCH_variable_write(uint16_t adds, uint16_t data)
 	  HAL_UART_Transmit(&huart1, buffer_variable_data, 8, 10);
 }
 
-
+void TOUCH_change_page(uint16_t page)
+{
+	uint8_t buffer_registor_data[7] = {USER_R3, USER_RA, 0x04, registor_write, 0x03, 0x00, 0x00};
+	buffer_registor_data[5] = (uint8_t)((page & 0xFF00)>>8);
+	buffer_registor_data[6] = (uint8_t)(page & 0x00FF);
+	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
+}
 
  //TalNum为当前接收缓存的角标，会循环；CurNum表示当前正在解析的指令角标，通常从StartNum开始计算；StartNum表示该组或下组指令的开始位置
 void TOUCH_extract_command(void)
@@ -281,10 +287,15 @@ void TOUCH_deal_command(uint8_t *p_Cmdbuf)
 		system_StatusSwitch(MCUsystem.system_status, 1);
 	}
 	else if(UIaddr_reset == command_adds)
-	{//终止情况
+	{//复位情况
 		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
 		if(temp_data == 0x0001) system_MCUreset();
-	}		
+	}
+	else if(UIaddr_warring == command_adds)
+	{//警告知晓消除警告
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		if(temp_data == 0x0001) system_know_warring();
+	}			
 	else{
 		for(i=0;i<data_len;i++)
 		{

@@ -77,6 +77,9 @@
 // ÉèÖÃ°å¿é
 #define UIaddr_reset 0x0023
 
+// ¾¯¸æ°å¿é
+#define UIaddr_warring 0x0036
+
 #define UIaddr_pump_freq 0x0094
 #define UIaddr_pump_pwm 0x0098
 
@@ -109,5 +112,6 @@ void TOUCH_curve_write(void);
 void TOUCH_extract_command(void);
 void TOUCH_deal_command(uint8_t *p_Cmdbuf);
 void TOUCH_run_command(uint16_t cmd);
+void TOUCH_change_page(uint16_t page);
 
 #endif /* __TOUCH_H__ */

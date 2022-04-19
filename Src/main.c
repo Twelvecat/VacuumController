@@ -23,7 +23,6 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "HeapStrcut.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -52,6 +51,7 @@ uint8_t count_leak;
 uint8_t count_time;
 uint8_t count_hp5806;
 uint8_t count_pid;
+uint8_t current_proccess_event;
 uint8_t flag_proccess_event;
 
 /* USER CODE END PV */
@@ -73,14 +73,13 @@ void Monitor_modifications(void)
 	{//时间模块
 		count_time=0;
 		TIM_run(MCUsystem.time);
-		TOUCH_curve_write();
 	}
 	if(count_leak >= 5)
 	{//泄漏监测
 		count_leak = 0;
 		LEAK_cheack();
 	}
-	if(count_updata>2)
+	if(count_updata>3)
 	{//屏幕更新模块
 		TOUCH_UpdataUI();
 		count_updata=0;
@@ -90,6 +89,7 @@ void Monitor_modifications(void)
 		count_hp5806=0;
 		HP5806_run(MCUsystem.hp5806_A);
     HP5806_run(MCUsystem.hp5806_B);
+		TOUCH_curve_write();
 	}
 	if(count_pid>1)
 	{//pid模块
@@ -107,18 +107,130 @@ void Monitor_modifications(void)
 	system_status_run();
 }
 
+int check_safe_event(PriorityQueue *pq, SafeEvent *currentSafeEvent)
+{
+	if(currentSafeEvent->data != current_proccess_event)
+		{//来了一个新事件，且优先级高
+			current_proccess_event = currentSafeEvent->data;
+			flag_proccess_event = 1;
+			return 1;
+		}
+		else if(flag_proccess_event)
+		{//可能来了一个新事件，也可能是同个事件，内容一致，属于重复触发，且未处理完毕
+			return 0;//等待处理
+		}
+		else
+		{//理论上属于，来了一个新事件，但内容和上次一样，属于重复触发，上次事件处理完毕
+			HEAP_pop(pq,currentSafeEvent);
+			return 0;//就不应该执行，因为在事件结束后需要清空当前事件，所以处理完毕后c和f都为0;只有事件内容为0才可能触发
+		}
+}
+
+
+/*
+0x01: 温度上限 P：1
+0x02: 温度下限 P：1
+0x03: 气压上限 P：4
+0x04: 气压下限 P：5
+0x05: 管道泄漏 P：2
+0x06: 设备初始化未通过 P：3
+*/
+uint8_t event_flag = 0;
 void process_safe_event(PriorityQueue *pq)
 {
-	SafeEvent *currentSafeEvent;
+	SafeEvent currentSafeEvent;
 	if(HEAP_is_empty(pq))
 	{
-		flag_proccess_event = 0;//无待处理的事件
+		current_proccess_event = 0x00;//无待处理的事件
+		flag_proccess_event = 0;
 		return;
 	}
-	flag_proccess_event = 1;//有待处理的事件
-	HEAP_find_max(pq, currentSafeEvent);
+	HEAP_find_max(pq, &currentSafeEvent);
 	//此处解析事件
+	if(currentSafeEvent.data == 0x01)
+	{
+		if(check_safe_event(pq, &currentSafeEvent))
+		{
+			if(MCUsystem.system_status->current!=6)RGB_Change(MCUsystem.rgb,6);
+			TOUCH_change_page(0x002D);
+		}
+	}
+	else if(currentSafeEvent.data == 0x02)
+	{
+		if(check_safe_event(pq, &currentSafeEvent))
+		{
+			if(MCUsystem.system_status->current!=6)RGB_Change(MCUsystem.rgb,6);
+			TOUCH_change_page(0x002C);
+		}
+	}
+	else if(currentSafeEvent.data == 0x03)
+	{
+		if(check_safe_event(pq, &currentSafeEvent))
+		{
+			TOUCH_change_page(0x002F);
+			user_main_info("终止前压力测量结果为：%.2fhPa", MCUsystem.hp5806_B->Pcomp / 100);
+			if(MCUsystem.system_status->current!=6){
+				if(MCUsystem.system_status->current == 2 ||  MCUsystem.system_status->current == 3)
+				{
+					system_StatusSwitch(MCUsystem.system_status, 3);
+					system_auto_pause();
+					MCUsystem.system_status->flag_change = 0;
+				}
+				else if(MCUsystem.system_status->current == 4 ||  MCUsystem.system_status->current == 5)
+				{
+					system_StatusSwitch(MCUsystem.system_status, 5);
+					system_manual_pause();
+					MCUsystem.system_status->flag_change = 0;
+				}
+				else
+				{
+					system_StatusSwitch(MCUsystem.system_status, 1);
+					system_into_prep();
+					MCUsystem.system_status->flag_change = 0;
+				}
+			}
+		if(MCUsystem.system_status->current!=6)RGB_Change(MCUsystem.rgb,4);
+		}
+	}
+	else if(currentSafeEvent.data == 0x04)
+	{
+		if(check_safe_event(pq, &currentSafeEvent))
+		{
+			TOUCH_change_page(0x0030);
+			user_main_info("终止前压力测量结果为：%.2fhPa", MCUsystem.hp5806_B->Pcomp / 100);
+			if(MCUsystem.system_status->current!=6){
+				if(MCUsystem.system_status->current == 2 ||  MCUsystem.system_status->current == 3)
+				{
+					system_StatusSwitch(MCUsystem.system_status, 3);
+					system_auto_pause();
+					MCUsystem.system_status->flag_change = 0;
+				}
+				else if(MCUsystem.system_status->current == 4 ||  MCUsystem.system_status->current == 5)
+				{
+					system_StatusSwitch(MCUsystem.system_status, 5);
+					system_manual_pause();
+					MCUsystem.system_status->flag_change = 0;
+				}
+				else
+				{
+					system_StatusSwitch(MCUsystem.system_status, 1);
+					system_into_prep();
+					MCUsystem.system_status->flag_change = 0;
+				}
+			}
+		if(MCUsystem.system_status->current!=6)RGB_Change(MCUsystem.rgb,4);
+		}
+	}
+	else if(currentSafeEvent.data == 0x05)
+	{
+		if(check_safe_event(pq, &currentSafeEvent))
+		{
+			if(MCUsystem.system_status->current!=6)RGB_Change(MCUsystem.rgb,6);
+			TOUCH_change_page(0x002B);
+		}
+	}
 }
+
 /* USER CODE END 0 */
 
 /**
