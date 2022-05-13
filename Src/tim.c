@@ -309,8 +309,10 @@ void TIM_run(struct _time *time)
 		time->sec += 1;
 		if(time->sec >= 60){
 			time->min += 1;
+			time->sec = 0;
 			if(time->min >= 60){
 				time->hour += 1;
+				time->min = 0;
 				if(time->hour>9999)
 					time->hour=0;
 			}

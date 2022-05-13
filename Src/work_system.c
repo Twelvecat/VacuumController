@@ -213,6 +213,43 @@ void system_manual_finish(void)
 	system_StatusSwitch(MCUsystem.system_status, 1);
 }
 
+void change_page(uint8_t current){
+	if(current == 1)
+	{
+		RGB_Change(MCUsystem.rgb,1);
+		TOUCH_change_page(0x0003);
+	}
+	else if(current == 2)
+	{
+		RGB_Change(MCUsystem.rgb,2);
+		TOUCH_change_page(0x0004);
+	}
+	else if(current == 3)
+	{
+		RGB_Change(MCUsystem.rgb,1);
+		TOUCH_change_page(0x0005);
+	}
+	else if(current == 4)
+	{
+		RGB_Change(MCUsystem.rgb,2);
+		TOUCH_change_page(0x0015);
+	}
+	else if(current == 5)
+	{
+		RGB_Change(MCUsystem.rgb,1);
+		TOUCH_change_page(0x0016);
+	}
+	else if(current == 6)
+	{
+		RGB_Change(MCUsystem.rgb,4);
+		TOUCH_change_page(0x002E);
+	}
+	else
+	{
+		RGB_Change(MCUsystem.rgb,1);
+		TOUCH_change_page(0x0003);
+	}
+}
 
 void system_know_warring(void)
 {
@@ -260,6 +297,7 @@ void system_know_warring(void)
 	else if(Event.data == 0x03)event_flag = event_flag&0xFB;
 	else if(Event.data == 0x04)event_flag = event_flag&0xF7;
 	else if(Event.data == 0x05)event_flag = event_flag&0xEF;
+	TOUCH_safeEvent_Qt(0x0000);
 }
 
 void system_MCUreset(void)

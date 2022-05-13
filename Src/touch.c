@@ -1,6 +1,7 @@
 #include "touch.h"
 
 extern struct _system MCUsystem;
+extern uint8_t uart2_isbusy;
 uint16_t StartNum=0,TalNum=0;
 uint8_t CommBuff[BUFFER_SIZE];//定义指令缓冲区
 uint8_t buffer_variable_data[8] = {USER_R3, USER_RA, 0x05, variable_write, 0x00, 0x00, 0x00, 0x00};
@@ -19,18 +20,28 @@ void TOUCH_UpdataUI(void)
 		TOUCH_UpdataRelay();
 		TOUCH_UpdataPres();
 		TOUCH_UpdataTime();
+		TOUCH_UpdataStatus();
 //		TOUCH_UpdataPID();
 //		TOUCH_UpdataPres();
-//		TOUCH_UpdataStatus();
+
 //		user_touch_info("UI更新完毕");
+}
+
+
+void TOUCH_safeEvent_Qt(uint16_t event){
+	TOUCH_variable_write2(UIaddr_warring, (uint16_t)(event));
 }
 
 void TOUCH_UpdataHP5806(void)
 {//仪表盘
 		TOUCH_variable_write(UIaddr_hp5806_B_pres, (uint16_t)(MCUsystem.hp5806_B->Pcomp/10));
+			TOUCH_variable_write2(UIaddr_hp5806_B_pres, (uint16_t)(MCUsystem.hp5806_B->Pcomp/10));
 		TOUCH_variable_write(UIaddr_hp5806_A_pres, (uint16_t)(MCUsystem.hp5806_A->Pcomp/10));
+			TOUCH_variable_write2(UIaddr_hp5806_A_pres, (uint16_t)(MCUsystem.hp5806_A->Pcomp/10));
 		TOUCH_variable_write(UIaddr_hp5806_B_temp, (int16_t)(MCUsystem.hp5806_B->Tcomp*10));
+			TOUCH_variable_write2(UIaddr_hp5806_B_temp, (int16_t)(MCUsystem.hp5806_B->Tcomp*10));
 		TOUCH_variable_write(UIaddr_hp5806_A_temp, (int16_t)(MCUsystem.hp5806_A->Tcomp*10));
+			TOUCH_variable_write2(UIaddr_hp5806_A_temp, (int16_t)(MCUsystem.hp5806_A->Tcomp*10));
 		TOUCH_variable_write(UIaddr_hp5806_B_pres_ptr, (uint16_t)(1200-MCUsystem.hp5806_B->Pcomp/100));
 		TOUCH_variable_write(UIaddr_hp5806_B_temp_ptr, (uint16_t)(15+MCUsystem.hp5806_B->Tcomp));
 	
@@ -41,7 +52,9 @@ void TOUCH_UpdataPres(void)
 {//负压情况
 		uint16_t temp = (uint16_t)(MCUsystem.hp5806_A->Pcomp/10-MCUsystem.hp5806_B->Pcomp/10);
 		TOUCH_variable_write(UIaddr_set_pres, (uint16_t)(MCUsystem.set_value*10));
+			TOUCH_variable_write2(UIaddr_set_pres, (uint16_t)(MCUsystem.set_value*10));
 		TOUCH_variable_write(UIaddr_current_pres, temp);
+			TOUCH_variable_write2(UIaddr_current_pres, temp);
 		user_touch_info("负压情况更新完毕");
 }
 
@@ -49,16 +62,22 @@ void TOUCH_UpdataRelay(void)
 {//继电器情况
 		uint16_t temp = (uint16_t)(((MCUsystem.relay_A->status & 0xFF) << 1) | (MCUsystem.relay_B->status & 0xFF) );
 		TOUCH_variable_write(UIaddr_relay_status, temp);
+			TOUCH_variable_write2(UIaddr_relay_status, temp);
 		user_touch_info("负压情况更新完毕");
 }
 
 void TOUCH_UpdataTime(void)
 {//时间情况
 	TOUCH_variable_write(UIaddr_hour, MCUsystem.time->hour);
+		TOUCH_variable_write2(UIaddr_hour, MCUsystem.time->hour);
 	TOUCH_variable_write(UIaddr_min, MCUsystem.time->min);
+		TOUCH_variable_write2(UIaddr_min, MCUsystem.time->min);
 	TOUCH_variable_write(UIaddr_sec, MCUsystem.time->sec);
+		TOUCH_variable_write2(UIaddr_sec, MCUsystem.time->sec);
 	TOUCH_variable_write(UIaddr_setting_sec, MCUsystem.time->setting_sec);
+		TOUCH_variable_write2(UIaddr_setting_sec, MCUsystem.time->setting_sec);
 	TOUCH_variable_write(UIaddr_remainder_sec, MCUsystem.time->remainder_sec);
+		TOUCH_variable_write2(UIaddr_remainder_sec, MCUsystem.time->remainder_sec);
 	user_touch_info("时间情况更新完毕");
 }
 
@@ -107,13 +126,15 @@ void TOUCH_curve_write(void)
 
 void TOUCH_UpdataStatus(void)
 {//状态更新（服务于远程），配合上位机开发
-	uint8_t buffer_registor_data[7] = {USER_R3, USER_RA, 0x04, registor_write, 0x03, 0x00, 0x00};
-	if(MCUsystem.system_status->current == 1)buffer_registor_data[6]=0x03;
-	else if(MCUsystem.system_status->current == 2)buffer_registor_data[6]=0x04;
-	else if(MCUsystem.system_status->current == 3)buffer_registor_data[6]=0x05;
-	else if(MCUsystem.system_status->current == 4)buffer_registor_data[6]=0x15;
-	else if(MCUsystem.system_status->current == 5)buffer_registor_data[6]=0x16;
-	HAL_UART_Transmit(&huart1, buffer_registor_data, 7, 10);
+		uint16_t temp = (uint16_t)(MCUsystem.system_status->current);
+		TOUCH_variable_write2(0x003D, temp);
+	//更新输出速度
+		temp = (uint16_t)(MCUsystem.output_value*10);
+		TOUCH_variable_write2(0x013D, temp);
+	//更新手动速度
+		temp = (uint16_t)(MCUsystem.output_manual/4);
+		TOUCH_variable_write2(UIaddr_manual_pwm, temp);
+		TOUCH_variable_write(UIaddr_manual_pwm, temp);
 }
 
 void TOUCH_UpdataPump(void)
@@ -143,6 +164,20 @@ void TOUCH_variable_write(uint16_t adds, uint16_t data)
 		buffer_variable_data[7] = (uint8_t)(data & 0x00FF);
 	  HAL_UART_Transmit(&huart1, buffer_variable_data, 8, 10);
 }
+
+void TOUCH_variable_write2(uint16_t adds, uint16_t data)
+{
+		buffer_variable_data[3] = variable_write;
+		buffer_variable_data[4] = (uint8_t)((adds & 0xFF00)>>8);
+		buffer_variable_data[5] = (uint8_t)(adds & 0x00FF);
+		buffer_variable_data[6] = (uint8_t)((data & 0xFF00)>>8);
+		buffer_variable_data[7] = (uint8_t)(data & 0x00FF);
+		while(uart2_isbusy == 1);
+		uart2_isbusy=1;
+		HAL_UART_Transmit_DMA(&huart2,buffer_variable_data,8);
+		HAL_Delay(2);
+}
+
 
 void TOUCH_change_page(uint16_t page)
 {
@@ -274,6 +309,18 @@ void TOUCH_deal_command(uint8_t *p_Cmdbuf)
 		if(temp_data == UIaddr_auto_run) 	system_StatusSwitch(MCUsystem.system_status, 2);
 		else if(temp_data == UIaddr_auto_pause) system_StatusSwitch(MCUsystem.system_status, 3);
 		else if(temp_data == UIaddr_auto_continue) system_StatusSwitch(MCUsystem.system_status, 2);
+		else if(UIaddr_qt_continue == temp_data){
+			system_StatusSwitch(MCUsystem.system_status, 2);
+			change_page(2);
+		}
+		else if(UIaddr_qt_pause == temp_data){
+			system_StatusSwitch(MCUsystem.system_status, 3);
+			change_page(3);
+		}
+		else if(UIaddr_qt_run == temp_data){
+			system_StatusSwitch(MCUsystem.system_status, 2);
+			change_page(2);
+		}
 	}	
 	else if(UIaddr_manual == command_adds)
 	{//手动情况		
@@ -281,10 +328,24 @@ void TOUCH_deal_command(uint8_t *p_Cmdbuf)
 		if(temp_data == UIaddr_manual_run) 	system_StatusSwitch(MCUsystem.system_status, 4);
 		else if(temp_data == UIaddr_manual_pause) system_StatusSwitch(MCUsystem.system_status, 5);
 		else if(temp_data == UIaddr_manual_continue) system_StatusSwitch(MCUsystem.system_status, 4);
+		else if(UIaddr_qt_continue == temp_data){
+			system_StatusSwitch(MCUsystem.system_status, 4);
+			change_page(4);
+		}
+		else if(UIaddr_qt_pause == temp_data){
+			system_StatusSwitch(MCUsystem.system_status, 5);
+			change_page(5);
+		}
+		else if(UIaddr_qt_run == temp_data){
+			system_StatusSwitch(MCUsystem.system_status, 4);
+			change_page(4);
+		}
 	}
 	else if(UIaddr_stop == command_adds)
 	{//终止情况
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
 		system_StatusSwitch(MCUsystem.system_status, 1);
+		if(temp_data == 0x0101)change_page(1);
 	}
 	else if(UIaddr_reset == command_adds)
 	{//复位情况
@@ -295,6 +356,7 @@ void TOUCH_deal_command(uint8_t *p_Cmdbuf)
 	{//警告知晓消除警告
 		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
 		if(temp_data == 0x0001) system_know_warring();
+		else if(temp_data == 0x0101) {system_know_warring();}
 	}			
 	else{
 		for(i=0;i<data_len;i++)

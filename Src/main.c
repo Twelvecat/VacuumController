@@ -19,10 +19,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -45,7 +47,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t usart1buff[30];
+uint8_t usart1buff[10];
+uint8_t usart2buff[10];
 uint8_t count_updata;
 uint8_t count_leak;
 uint8_t count_time;
@@ -153,6 +156,7 @@ void process_safe_event(PriorityQueue *pq)
 		{
 			if(MCUsystem.system_status->current!=6)RGB_Change(MCUsystem.rgb,6);
 			TOUCH_change_page(0x002D);
+			TOUCH_safeEvent_Qt(currentSafeEvent.data);
 		}
 	}
 	else if(currentSafeEvent.data == 0x02)
@@ -161,6 +165,7 @@ void process_safe_event(PriorityQueue *pq)
 		{
 			if(MCUsystem.system_status->current!=6)RGB_Change(MCUsystem.rgb,6);
 			TOUCH_change_page(0x002C);
+			TOUCH_safeEvent_Qt(currentSafeEvent.data);
 		}
 	}
 	else if(currentSafeEvent.data == 0x03)
@@ -168,6 +173,7 @@ void process_safe_event(PriorityQueue *pq)
 		if(check_safe_event(pq, &currentSafeEvent))
 		{
 			TOUCH_change_page(0x002F);
+			TOUCH_safeEvent_Qt(currentSafeEvent.data);
 			user_main_info("终止前压力测量结果为：%.2fhPa", MCUsystem.hp5806_B->Pcomp / 100);
 			if(MCUsystem.system_status->current!=6){
 				if(MCUsystem.system_status->current == 2 ||  MCUsystem.system_status->current == 3)
@@ -197,6 +203,7 @@ void process_safe_event(PriorityQueue *pq)
 		if(check_safe_event(pq, &currentSafeEvent))
 		{
 			TOUCH_change_page(0x0030);
+			TOUCH_safeEvent_Qt(currentSafeEvent.data);
 			user_main_info("终止前压力测量结果为：%.2fhPa", MCUsystem.hp5806_B->Pcomp / 100);
 			if(MCUsystem.system_status->current!=6){
 				if(MCUsystem.system_status->current == 2 ||  MCUsystem.system_status->current == 3)
@@ -227,6 +234,7 @@ void process_safe_event(PriorityQueue *pq)
 		{
 			if(MCUsystem.system_status->current!=6)RGB_Change(MCUsystem.rgb,6);
 			TOUCH_change_page(0x002B);
+			TOUCH_safeEvent_Qt(currentSafeEvent.data);
 		}
 	}
 }
@@ -261,6 +269,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   MX_USART1_UART_Init();
   MX_I2C2_Init();
@@ -279,6 +288,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim4);
 //	UART_Start_Receive_IT(&huart1, uint8_t *pData, uint16_t Size);
 	HAL_UART_Receive_IT(&huart1, usart1buff, 1);
+	HAL_UART_Receive_IT(&huart2, usart2buff, 1);
 	TOUCH_Reste();
   HAL_Delay(2000);
   /* USER CODE END 2 */
@@ -295,6 +305,7 @@ int main(void)
 		TOUCH_extract_command();
 		Monitor_modifications();
 		process_safe_event(safe_event_pq);
+		//状态更新(本机发给上位机，轮询，上位机修改直接发送)，当前速度（直接发没啥问题），手自动速度（需要同步，同时发）
 		PUMP_changeSpeed(MCUsystem.pump, MCUsystem.output_value);
   }
   /* USER CODE END 3 */

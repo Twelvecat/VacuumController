@@ -56,6 +56,9 @@
 #define UIaddr_auto_run 0x0001
 #define UIaddr_auto_pause 0x0002
 #define UIaddr_auto_continue 0x0003
+#define UIaddr_qt_run 0x0101
+#define UIaddr_qt_pause 0x0102
+#define UIaddr_qt_continue 0x0103
 #define UIaddr_manual 0x0024
 #define UIaddr_manual_run 0x0001
 #define UIaddr_manual_pause 0x0002
@@ -99,6 +102,7 @@
 
 void TOUCH_Reste(void);
 void TOUCH_variable_write(uint16_t adds, uint16_t data);
+void TOUCH_variable_write2(uint16_t adds, uint16_t data);
 void TOUCH_UpdataUI(void);
 void TOUCH_UpdataHP5806(void);
 void TOUCH_UpdataRelay(void);
@@ -113,5 +117,6 @@ void TOUCH_extract_command(void);
 void TOUCH_deal_command(uint8_t *p_Cmdbuf);
 void TOUCH_run_command(uint16_t cmd);
 void TOUCH_change_page(uint16_t page);
+void TOUCH_safeEvent_Qt(uint16_t event);
 
 #endif /* __TOUCH_H__ */
