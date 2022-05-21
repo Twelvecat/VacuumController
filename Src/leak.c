@@ -20,9 +20,11 @@ void LEAK_cheack(void){
 		else if(leak_current==10) 
 		{
 			leak_current=0;
-			float temp1 = MCUsystem.hp5806_A->Pcomp/100.0 - leak_value[9]-MCUsystem.set_value;
-			if(temp1> -10 && temp1 <10) return;
+			float temp = leak_value[0] - leak_value[9];
+			if(temp< -8 || temp >8) return;
 			else{//Ìí¼ÓĞ¹Â©ÊÂ¼ş
+				float temp1 = MCUsystem.hp5806_A->Pcomp/100.0 - MCUsystem.hp5806_B->Pcomp/100.0 - MCUsystem.set_value;
+				if(temp1> -5) return;
 				if((event_flag&0x10)  == 0){
 					SafeEvent Event;
 					Event.priority = 2;

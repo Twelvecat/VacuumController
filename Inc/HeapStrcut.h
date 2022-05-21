@@ -6,7 +6,7 @@
 #include <string.h>
 #include "main.h"
 
-#define USER_HEAP_DEBUG
+//#define USER_HEAP_DEBUG
 #ifdef USER_HEAP_DEBUG
 	#define user_heap_printf(format, ...) printf( format "\r\n", ##__VA_ARGS__)
 	#define user_heap_info(format, ...) printf("[\theap]info:" format "\r\n", ##__VA_ARGS__)

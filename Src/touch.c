@@ -1,7 +1,10 @@
 #include "touch.h"
+#include "fuzzyPID.h"
 
 extern struct _system MCUsystem;
 extern uint8_t uart2_isbusy;
+extern struct PID** pid_vector;
+extern int control_id;
 uint16_t StartNum=0,TalNum=0;
 uint8_t CommBuff[BUFFER_SIZE];//定义指令缓冲区
 uint8_t buffer_variable_data[8] = {USER_R3, USER_RA, 0x05, variable_write, 0x00, 0x00, 0x00, 0x00};
@@ -357,7 +360,56 @@ void TOUCH_deal_command(uint8_t *p_Cmdbuf)
 		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
 		if(temp_data == 0x0001) system_know_warring();
 		else if(temp_data == 0x0101) {system_know_warring();}
-	}			
+	}
+	else if(UIaddr_pid_mode == command_adds)
+	{//pid_mode
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		if(temp_data == 0x0001) MCUsystem.pid_mode = 1;
+		else if(temp_data == 0x0000) MCUsystem.pid_mode = 0;
+	}
+
+	else if(UIaddr_pid_p == command_adds)
+	{//pid_kp
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		MCUsystem.pid->Kp = ((int16_t)temp_data)/1000.0f;
+		pid_vector[control_id]->kp = MCUsystem.pid->Kp;
+		pid_vector[control_id]->delta_kp_max = pid_vector[control_id]->kp/MCUsystem.delta_k;
+	}	
+
+	else if(UIaddr_pid_i == command_adds)
+	{//pid_ki
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		MCUsystem.pid->Ki = ((int16_t)temp_data)/1000.0f;
+		pid_vector[control_id]->ki = MCUsystem.pid->Ki;
+		pid_vector[control_id]->delta_ki_max = pid_vector[control_id]->ki/MCUsystem.delta_k;
+	}	
+
+	else if(UIaddr_pid_d == command_adds)
+	{//pid_kd
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		MCUsystem.pid->Kd = ((int16_t)temp_data)/1000.0f;
+		pid_vector[control_id]->kd = MCUsystem.pid->Kd;
+		pid_vector[control_id]->delta_kd_max = pid_vector[control_id]->kd/MCUsystem.delta_k;
+	}
+	else if(UIaddr_pid_delta_k == command_adds)
+	{//pid_delta_k
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		MCUsystem.delta_k = ((int16_t)temp_data)/1000.0f;
+		pid_vector[control_id]->delta_kp_max = pid_vector[control_id]->kp/MCUsystem.delta_k;
+		pid_vector[control_id]->delta_ki_max = pid_vector[control_id]->ki/MCUsystem.delta_k;
+		pid_vector[control_id]->delta_kd_max = pid_vector[control_id]->kd/MCUsystem.delta_k;
+	}	
+	else if(UIaddr_pid_updata == command_adds)
+	{//pid_delta_k
+		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		if(temp_data == 0x0001){
+			TOUCH_variable_write2(UIaddr_pid_mode, (uint16_t)(MCUsystem.pid_mode));
+			TOUCH_variable_write2(UIaddr_pid_p, (uint16_t)(pid_vector[control_id]->kp*1000));
+			TOUCH_variable_write2(UIaddr_pid_i, (uint16_t)(pid_vector[control_id]->ki*1000));
+			TOUCH_variable_write2(UIaddr_pid_d, (uint16_t)(pid_vector[control_id]->kd*1000));
+			TOUCH_variable_write2(UIaddr_pid_delta_k, (uint16_t)(MCUsystem.delta_k*1000));
+		}
+	}				
 	else{
 		for(i=0;i<data_len;i++)
 		{
@@ -394,3 +446,15 @@ void TOUCH_run_command(uint16_t cmd)
 0001：急停
 0002：手动模式
 */
+
+void TOUCH_pidData(void){
+		if(MCUsystem.pid_mode==0)printf("PID Mode:PID\n");
+		else if(MCUsystem.pid_mode==1)printf("PID Mode:fuzzyPID\n");
+		printf("PID Kp:%.3f\n",pid_vector[control_id]->kp);
+		printf("PID Ki:%.3f\n",pid_vector[control_id]->ki);
+		printf("PID Kd:%.3f\n",pid_vector[control_id]->kd);
+		printf("PID Delta:%.3f\n",MCUsystem.delta_k);
+		printf("PID Delta Kp Max:%.3f\n",pid_vector[control_id]->delta_kp_max);
+		printf("PID Delta Ki Max:%.3f\n",pid_vector[control_id]->delta_ki_max);
+		printf("PID Delta Kd Max:%.3f\n",pid_vector[control_id]->delta_kd_max);
+}

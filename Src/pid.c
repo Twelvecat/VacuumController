@@ -12,9 +12,9 @@ void PID_init(struct _pid *pid)
 	pid->voltage = 0.0;		//输出值
 	pid->integral = 0.0;	//积分值
 
-	pid->Kp = 0.67;
-	pid->Ki = 0.15;
-	pid->Kd = 0.3;
+	pid->Kp = 7.419;//4.63;//1.27;
+	pid->Ki = 0.269;//0.67;//0.45;
+	pid->Kd = 7.516;//0.67;//0.2;
 	pid->umax = 100; //用于积分分离
 	pid->umin = -100;
 	pid->dead_band = 1.5;
@@ -28,19 +28,21 @@ void PID_posRealize(struct _pid *pid, float speed, float ActualSpeed)
 	pid->err = pid->ActualSpeed - pid->SetSpeed;
 	user_pid_info("PID差值为:%.2f", pid->err);
 	if( (pid->err < pid->dead_band) && (pid->err > -pid->dead_band) ) pid->err = 0; //添加了死区，避开两个传感器的误差
-	if (pid->ActualSpeed > pid->SetSpeed + pid->umax) //若实际值大于最大值
-	{
-		index = 0;
-	}
-	else if (pid->ActualSpeed < pid->SetSpeed + pid->umin)
-	{
-		index = 0;
-	}
-	else
-	{
-		index = 1;
-		pid->integral += pid->err;//这个地方可以再研究研究，取消积分分离后是否需要清空积分状态
-	}
+//	if (pid->ActualSpeed > pid->SetSpeed + pid->umax) //若实际值大于最大值
+//	{
+//		index = 0;
+//	}
+//	else if (pid->ActualSpeed < pid->SetSpeed + pid->umin)
+//	{
+//		index = 0;
+//	}
+//	else
+//	{
+//		index = 1;
+//		pid->integral += pid->err;//这个地方可以再研究研究，取消积分分离后是否需要清空积分状态
+//	}
+	index = 1;
+	pid->integral += pid->err;
 	pid->voltage = pid->Kp * pid->err + index * pid->Ki * pid->integral + pid->Kd * (pid->err - pid->err_last);
 	if(pid->voltage<0) pid->voltage=0;
 	else if(pid->voltage > MAX_SPEED) pid->voltage = MAX_SPEED;

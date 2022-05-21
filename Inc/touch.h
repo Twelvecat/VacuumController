@@ -83,13 +83,20 @@
 // 警告板块
 #define UIaddr_warring 0x0036
 
+//控制参数
+#define UIaddr_pid_mode 0x0090
+#define UIaddr_pid_p 0x0091
+#define UIaddr_pid_i 0x0092
+#define UIaddr_pid_d 0x0093
+#define UIaddr_pid_delta_k 0x0094
+#define UIaddr_pid_updata 0x0095
+
 #define UIaddr_pump_freq 0x0094
 #define UIaddr_pump_pwm 0x0098
 
-#define UIaddr_pid_p 0x009C
-#define UIaddr_pid_i 0x00A0
-#define UIaddr_pid_d 0x00A4
-#define UIaddr_pid_mode 0x00A8
+
+
+
 
 
 
@@ -118,5 +125,6 @@ void TOUCH_deal_command(uint8_t *p_Cmdbuf);
 void TOUCH_run_command(uint16_t cmd);
 void TOUCH_change_page(uint16_t page);
 void TOUCH_safeEvent_Qt(uint16_t event);
+void TOUCH_pidData(void);
 
 #endif /* __TOUCH_H__ */

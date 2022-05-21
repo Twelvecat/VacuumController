@@ -102,16 +102,16 @@ struct PID {
 #define control_mode position_mode
 
 #if control_mode == position_mode
-#define max_error 100.0f
-#define max_delta_error 100.0f
+#define max_error 250.0f
+#define max_delta_error 250.0f
 #else
 #define max_error 12.0f
 #define max_delta_error 12.0f
 #endif
 //这个地方要注意哦
 #define min_pwm_output 0
-#define middle_pwm_output 500
-#define max_pwm_output 1000
+#define middle_pwm_output 200
+#define max_pwm_output 400
 
 struct fuzzy *fuzzy_init(unsigned int input_num, unsigned int output_num);
 

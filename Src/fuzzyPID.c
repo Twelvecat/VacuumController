@@ -10,7 +10,7 @@ struct fuzzy *fuzzy_init(unsigned int input_num, unsigned int output_num)
     fuzzy_struct->mf_params = (int *)malloc(4 * qf_default * sizeof(int));
     fuzzy_struct->rule_base = (int *)malloc(output_num * qf_default * qf_default * sizeof(int));
 #endif
-    fuzzy_struct->output = (float *)malloc(output_num * sizeof(float));
+    fuzzy_struct->output = (float *)malloc(output_num * sizeof(float));	
     return fuzzy_struct;
 }
 
@@ -190,7 +190,8 @@ void moc(const float *joint_membership, const unsigned int *index, const unsigne
 {
 
     float denominator_count = 0;
-    float numerator_count[fuzzy_struct->output_num];
+    //float numerator_count[fuzzy_struct->output_num];
+		float numerator_count[3];
     for (unsigned int l = 0; l < fuzzy_struct->output_num; ++l)
     {
         numerator_count[l] = 0;
@@ -224,7 +225,7 @@ void moc(const float *joint_membership, const unsigned int *index, const unsigne
     {
         fuzzy_struct->output[l] = numerator_count[l] / denominator_count;
 #ifdef fuzzy_pid_debug_print
-        printf("%f,%f,%f\n", numerator_count[l], denominator_count, fuzzy_struct->index[l]);
+        //printf("%f,%f,%f\n", numerator_count[l], denominator_count, fuzzy_struct->index[l]);
 #endif
     }
 }
@@ -247,9 +248,9 @@ void fuzzy_control(float e, float de, struct fuzzy *fuzzy_struct)
     float membership[qf_default * 2];   // Store membership
     unsigned int index[qf_default * 2]; // Store the index of each membership
     unsigned int count[2] = {0, 0};
-
+		int j = 0;
     {
-        int j = 0;
+        //int j = 0;
         for (int i = 0; i < qf_default; ++i)
         {
             float temp = mf(e, fuzzy_struct->mf_type[0], fuzzy_struct->mf_params + 4 * i);
@@ -305,7 +306,8 @@ void fuzzy_control(float e, float de, struct fuzzy *fuzzy_struct)
     }
 
     // Joint membership
-    float joint_membership[count[0] * count[1]];
+    //float joint_membership[count[0] * count[1]];
+		float joint_membership[49];
 
     for (int i = 0; i < count[0]; ++i)
     {
@@ -324,7 +326,7 @@ struct PID *raw_fuzzy_pid_init(float kp, float ki, float kd, float integral_limi
                                unsigned int df_type, int mf_params[], int rule_base[][qf_default],
                                int output_min_value, int output_middle_value, int output_max_value)
 {
-    struct PID *pid = (struct PID *)malloc(sizeof(struct PID));
+    struct PID *pid = (struct PID *)malloc(sizeof(struct PID));	
     pid->kp = kp;
     pid->ki = ki;
     pid->kd = kd;
@@ -463,7 +465,6 @@ float fuzzy_pid_control(float real, float idea, struct PID *pid)
                   pid->fuzzy_struct);
 
     pid->delta_kp = pid->fuzzy_struct->output[0] / 3.0f * pid->delta_kp_max + pid->kp;
-
     if (pid->fuzzy_struct->output_num >= 2)
         pid->delta_ki = pid->fuzzy_struct->output[1] / 3.0f * pid->delta_ki_max;
     else
@@ -475,7 +476,7 @@ float fuzzy_pid_control(float real, float idea, struct PID *pid)
         pid->delta_ki = 0;
 
 #ifdef fuzzy_pid_debug_print
-    printf("kp : %f, ki : %f, kd : %f\n", kp, ki, kd);
+    printf("kp : %f, ki : %f, kd : %f\n", pid->kp, pid->ki, pid->kd);
 #endif
 
     pid->intergral += (pid->ki + pid->delta_ki) * pid->current_error;
@@ -491,6 +492,8 @@ float fuzzy_pid_control(float real, float idea, struct PID *pid)
     pid->output = (pid->kp + pid->delta_kp) * pid->current_error + pid->intergral +
                   (pid->kd + pid->delta_kd) * (pid->current_error - pid->last_error);
     pid->output += pid->feed_forward * (float)idea;
+		
+		
     return pid->output;
 }
 

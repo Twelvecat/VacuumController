@@ -24,15 +24,57 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "fuzzyPID.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+#define DOF 1
+int rule_base[][qf_default] = {
+	//delta kp rule base
+	{PB, PB, PM, PM, PS, ZO, ZO},
+	{PB, PB, PM, PS, PS, ZO, NS},
+	{PM, PM, PM, PS, ZO, NS, NS},
+	{PM, PM, PS, ZO, NS, NM, NM},
+	{PS, PS, ZO, NS, NS, NM, NM},
+	{PS, ZO, NS, NM, NM, NM, NB},
+	{ZO, ZO, NM, NM, NM, NB, NB},
+	//delta ki rule base
+	{NB, NB, NM, NM, NS, ZO, ZO},
+	{NB, NB, NM, NS, NS, ZO, ZO},
+	{NB, NM, NS, NS, ZO, PS, PS},
+	{NM, NM, NS, ZO, PS, PM, PM},
+	{NM, NS, ZO, PS, PS, PM, PB},
+	{ZO, ZO, PS, PS, PM, PB, PB},
+	{ZO, ZO, PS, PM, PM, PB, PB},
+	//delta kd rule base
+	{PS, NS, NB, NB, NB, NM, PS},
+	{PS, NS, NB, NM, NM, NS, ZO},
+	{ZO, NS, NM, NM, NS, NS, ZO},
+	{ZO, NS, NS, NS, NS, NS, ZO},
+	{ZO, ZO, ZO, ZO, ZO, ZO, ZO},
+	{PB, PS, PS, PS, PS, PS, PB},
+	{PB, PM, PM, PM, PS, PS, PB} };
 
+// Default parameters of membership function
+int mf_params[4 * qf_default] = { -3, -3, -2, 0,
+								 -3, -2, -1, 0,
+								 -2, -1,  0, 0,
+								 -1,  0,  1, 0,
+								  0,  1,  2, 0,
+								  1,  2,  3, 0,
+								  2,  3,  3, 0 };
+
+// Default parameters of pid controller
+float fuzzy_pid_params[DOF][pid_params_count] = { {1.27f,0.45f,0.2f,0,0,0,1} };
+
+struct PID** pid_vector;
+int control_id = 0;
+float real = 0;
+float idea = 100.0f;
+bool direct[DOF] = { true};
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -94,13 +136,20 @@ void Monitor_modifications(void)
     HP5806_run(MCUsystem.hp5806_B);
 		TOUCH_curve_write();
 	}
-	if(count_pid>1)
+	if(count_pid>=5)
 	{//pidÄ£¿é
 		count_pid=0;
 		if(MCUsystem.system_status->current == 2)
 		{
-			PID_posRealize(MCUsystem.pid, (*MCUsystem.hp5806_A).Pcomp/100-MCUsystem.set_value, (*MCUsystem.hp5806_B).Pcomp/100);
-			MCUsystem.output_value = (*MCUsystem.pid).voltage;
+			if(MCUsystem.pid_mode == 0){
+				PID_posRealize(MCUsystem.pid, (*MCUsystem.hp5806_A).Pcomp/100-MCUsystem.set_value, (*MCUsystem.hp5806_B).Pcomp/100);
+				MCUsystem.output_value = (*MCUsystem.pid).voltage;
+			}
+			else {
+				idea =  MCUsystem.set_value;
+				real = (*MCUsystem.hp5806_A).Pcomp/100-(*MCUsystem.hp5806_B).Pcomp/100;
+				MCUsystem.output_value = fuzzy_pid_motor_pwd_output(real, idea, direct[control_id], pid_vector[control_id]);
+			}
 		}
 	}
 	if(MCUsystem.system_status->current == 4)
@@ -290,6 +339,10 @@ int main(void)
 	HAL_UART_Receive_IT(&huart1, usart1buff, 1);
 	HAL_UART_Receive_IT(&huart2, usart2buff, 1);
 	TOUCH_Reste();
+	fuzzy_pid_params[control_id][0] = MCUsystem.pid->Kp;
+	fuzzy_pid_params[control_id][1] = MCUsystem.pid->Ki;
+	fuzzy_pid_params[control_id][2] = MCUsystem.pid->Kd;
+	pid_vector = fuzzy_pid_vector_init(fuzzy_pid_params, MCUsystem.delta_k, 2, 1, 0, mf_params, rule_base, DOF);
   HAL_Delay(2000);
   /* USER CODE END 2 */
 

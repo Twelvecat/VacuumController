@@ -1,4 +1,5 @@
 #include "work_system.h"
+#include "fuzzyPID.h"
 
 struct _system MCUsystem;
 struct _system_status system_status;
@@ -12,6 +13,13 @@ extern uint8_t current_proccess_event;
 extern uint8_t flag_proccess_event;
 extern uint8_t event_flag;
 
+#define DOF 1
+extern int rule_base[][qf_default];
+extern int mf_params[4 * qf_default];
+extern float fuzzy_pid_params[DOF][pid_params_count];
+extern struct PID** pid_vector;
+extern int control_id;
+
 uint8_t flag_pump_stop = 0;
 
 void system_init(void){
@@ -23,6 +31,7 @@ void system_init(void){
 	MCUsystem.pid = &pid;
 	PID_init(MCUsystem.pid);
 	MCUsystem.pid_mode = 0;
+	MCUsystem.delta_k = 2.0f;
 	MCUsystem.hp5806_A = &hp5806_A;
 	MCUsystem.hp5806_B = &hp5806_B;
 	user_worksys_info("°åÔØHP5806³¢ÊÔ³õÊ¼»¯");
@@ -156,6 +165,12 @@ void system_into_prep(void){
 	RGB_Change(MCUsystem.rgb,1);
 	TIM_TimeExit(MCUsystem.time);
 	PID_init(MCUsystem.pid);
+	pid_vector[control_id]->last_error = 0.0f;
+	pid_vector[control_id]->current_error = 0.0f;
+	pid_vector[control_id]->intergral = 0.0f;
+	pid_vector[control_id]->delta_kp = 0;
+	pid_vector[control_id]->delta_ki = 0;
+	pid_vector[control_id]->delta_kd = 0;
 }
 
 void system_auto_run(void){
