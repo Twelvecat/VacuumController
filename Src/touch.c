@@ -409,6 +409,14 @@ void TOUCH_deal_command(uint8_t *p_Cmdbuf)
 			TOUCH_variable_write2(UIaddr_pid_d, (uint16_t)(pid_vector[control_id]->kd*1000));
 			TOUCH_variable_write2(UIaddr_pid_delta_k, (uint16_t)(MCUsystem.delta_k*1000));
 		}
+		else if(temp_data == 0x0101){
+			uint32_t tempflash = (uint32_t)(MCUsystem.pid_mode)&0x00000001; 
+			FLASH_EEPROM_Write(tempflash,0);
+			FLASH_EEPROM_Write(MCUsystem.pid->Kp,1);
+			FLASH_EEPROM_Write(MCUsystem.pid->Ki,2);
+			FLASH_EEPROM_Write(MCUsystem.pid->Kd,3);
+			FLASH_EEPROM_Write(MCUsystem.delta_k,4);
+		}		
 	}				
 	else{
 		for(i=0;i<data_len;i++)

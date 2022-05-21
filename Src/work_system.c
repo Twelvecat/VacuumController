@@ -164,7 +164,9 @@ void system_into_prep(void){
 	PUMP_openPump(MCUsystem.pump);
 	RGB_Change(MCUsystem.rgb,1);
 	TIM_TimeExit(MCUsystem.time);
-	PID_init(MCUsystem.pid);
+	MCUsystem.pid->err = 0.0;			//实际误差
+	MCUsystem.pid->err_last = 0.0;	//上一次的误差
+	MCUsystem.pid->integral = 0.0;	//积分值
 	pid_vector[control_id]->last_error = 0.0f;
 	pid_vector[control_id]->current_error = 0.0f;
 	pid_vector[control_id]->intergral = 0.0f;

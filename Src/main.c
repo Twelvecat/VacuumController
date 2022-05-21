@@ -288,6 +288,37 @@ void process_safe_event(PriorityQueue *pq)
 	}
 }
 
+
+/**
+  * @brief  在FLASH中存储变量值，目前并不清楚这个程序有多大，能写到多少页，先定义在第127页中
+  * @param  用STM32中FLASH存储空间模拟EEPROM的读写
+  * @retval 参数：写入要存储的值
+  */
+void FLASH_EEPROM_Write(uint32_t n, uint8_t offset)
+{
+    HAL_FLASH_Unlock();     //解锁
+    uint32_t writeFlashData = n;        //代写入的值
+    uint32_t addr = 0x0800FC00 + offset*4;                  //写入的地址
+    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,addr, writeFlashData); //向FLASH中写入
+    printf("at address:0x%x, read value:%d\r\n", addr, *(__IO uint32_t*)addr);
+    HAL_FLASH_Lock();
+}
+/**
+  * @brief  读出存储地址中的内容
+  * @param  用STM32中FLASH存储空间模拟EEPROM的读写
+  * @retval 返回值：从FLASH中读出数据
+  */
+uint32_t FLASH_EEPROM_Read(uint8_t offset)
+{
+    HAL_FLASH_Unlock();
+    uint32_t Page = 0;
+    uint32_t addr = 0x0800FC00+ offset*4;;                  //写入的地址
+    Page=*(__IO uint32_t*)addr;
+    return Page;
+}
+
+
+
 /* USER CODE END 0 */
 
 /**
@@ -330,6 +361,13 @@ int main(void)
   HAL_Delay(1000); //需要给传感器上电进入状态一些时间，不然板载传感器会测不准
 	safe_event_pq = HEAP_init(10); //容量为10的安全事件优先队列
 	system_init();
+	
+	MCUsystem.pid_mode = (uint8_t)(FLASH_EEPROM_Read(0)&0x00000001);
+	MCUsystem.pid->Kp = FLASH_EEPROM_Read(1);
+	MCUsystem.pid->Ki = FLASH_EEPROM_Read(2);
+	MCUsystem.pid->Kd = FLASH_EEPROM_Read(3);
+	MCUsystem.delta_k = FLASH_EEPROM_Read(4);
+	
   user_main_info("GPIO,IIC1/2,USART1/2,TIM2/3/4初始化完成");
   user_main_info("定时器3中断开启，周期%.2fHz", 72000000.0 / (htim3.Instance->ARR + 1) / (htim3.Instance->PSC + 1));
   HAL_TIM_Base_Start_IT(&htim3);
@@ -344,6 +382,7 @@ int main(void)
 	fuzzy_pid_params[control_id][2] = MCUsystem.pid->Kd;
 	pid_vector = fuzzy_pid_vector_init(fuzzy_pid_params, MCUsystem.delta_k, 2, 1, 0, mf_params, rule_base, DOF);
   HAL_Delay(2000);
+	FLASH_EEPROM_Write(0x12345678,0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
