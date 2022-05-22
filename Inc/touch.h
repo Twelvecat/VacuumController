@@ -90,6 +90,7 @@
 #define UIaddr_pid_d 0x0093
 #define UIaddr_pid_delta_k 0x0094
 #define UIaddr_pid_updata 0x0095
+#define UIaddr_contorl_time 0x0096
 
 #define UIaddr_pump_freq 0x0094
 #define UIaddr_pump_pwm 0x0098

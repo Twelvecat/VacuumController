@@ -365,57 +365,65 @@ void TOUCH_deal_command(uint8_t *p_Cmdbuf)
 	{//pid_mode
 		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
 		if(temp_data == 0x0001) MCUsystem.pid_mode = 1;
-		else if(temp_data == 0x0000) MCUsystem.pid_mode = 0;
+		else MCUsystem.pid_mode = 0;
 	}
 
 	else if(UIaddr_pid_p == command_adds)
 	{//pid_kp
-		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
-		MCUsystem.pid->Kp = ((int16_t)temp_data)/1000.0f;
+		int16_t temp_int_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		MCUsystem.pid->Kp = ((int16_t)temp_int_data)/1000.0f;
 		pid_vector[control_id]->kp = MCUsystem.pid->Kp;
 		pid_vector[control_id]->delta_kp_max = pid_vector[control_id]->kp/MCUsystem.delta_k;
 	}	
 
 	else if(UIaddr_pid_i == command_adds)
 	{//pid_ki
-		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
-		MCUsystem.pid->Ki = ((int16_t)temp_data)/1000.0f;
+		int16_t temp_int_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		MCUsystem.pid->Ki = ((int16_t)temp_int_data)/1000.0f;
 		pid_vector[control_id]->ki = MCUsystem.pid->Ki;
 		pid_vector[control_id]->delta_ki_max = pid_vector[control_id]->ki/MCUsystem.delta_k;
 	}	
 
 	else if(UIaddr_pid_d == command_adds)
 	{//pid_kd
-		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
-		MCUsystem.pid->Kd = ((int16_t)temp_data)/1000.0f;
+		int16_t temp_int_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		MCUsystem.pid->Kd = ((int16_t)temp_int_data)/1000.0f;
 		pid_vector[control_id]->kd = MCUsystem.pid->Kd;
 		pid_vector[control_id]->delta_kd_max = pid_vector[control_id]->kd/MCUsystem.delta_k;
 	}
 	else if(UIaddr_pid_delta_k == command_adds)
 	{//pid_delta_k
-		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
-		MCUsystem.delta_k = ((int16_t)temp_data)/1000.0f;
+		int16_t temp_int_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
+		MCUsystem.delta_k = ((int16_t)temp_int_data)/1000.0f;
 		pid_vector[control_id]->delta_kp_max = pid_vector[control_id]->kp/MCUsystem.delta_k;
 		pid_vector[control_id]->delta_ki_max = pid_vector[control_id]->ki/MCUsystem.delta_k;
 		pid_vector[control_id]->delta_kd_max = pid_vector[control_id]->kd/MCUsystem.delta_k;
+	}	
+	else if(UIaddr_contorl_time == command_adds)
+	{//pid_delta_k
+		MCUsystem.control_time = p_Cmdbuf[8];
 	}	
 	else if(UIaddr_pid_updata == command_adds)
 	{//pid_delta_k
 		temp_data = ((uint16_t)p_Cmdbuf[7] << 8) | ((uint16_t)p_Cmdbuf[8]);
 		if(temp_data == 0x0001){
 			TOUCH_variable_write2(UIaddr_pid_mode, (uint16_t)(MCUsystem.pid_mode));
-			TOUCH_variable_write2(UIaddr_pid_p, (uint16_t)(pid_vector[control_id]->kp*1000));
-			TOUCH_variable_write2(UIaddr_pid_i, (uint16_t)(pid_vector[control_id]->ki*1000));
-			TOUCH_variable_write2(UIaddr_pid_d, (uint16_t)(pid_vector[control_id]->kd*1000));
-			TOUCH_variable_write2(UIaddr_pid_delta_k, (uint16_t)(MCUsystem.delta_k*1000));
+			TOUCH_variable_write2(UIaddr_contorl_time, (uint16_t)(MCUsystem.control_time));
+			TOUCH_variable_write2(UIaddr_pid_p, (int16_t)(pid_vector[control_id]->kp*1000));
+			TOUCH_variable_write2(UIaddr_pid_i, (int16_t)(pid_vector[control_id]->ki*1000));
+			TOUCH_variable_write2(UIaddr_pid_d, (int16_t)(pid_vector[control_id]->kd*1000));
+			TOUCH_variable_write2(UIaddr_pid_delta_k, (int16_t)(MCUsystem.delta_k*1000));
 		}
 		else if(temp_data == 0x0101){
-			uint32_t tempflash = (uint32_t)(MCUsystem.pid_mode)&0x00000001; 
-			FLASH_EEPROM_Write(tempflash,0);
-			FLASH_EEPROM_Write(MCUsystem.pid->Kp,1);
-			FLASH_EEPROM_Write(MCUsystem.pid->Ki,2);
-			FLASH_EEPROM_Write(MCUsystem.pid->Kd,3);
-			FLASH_EEPROM_Write(MCUsystem.delta_k,4);
+			FLASH_EEPROM_Write_config();
+		}
+		if(temp_data == 0x0111){
+			TOUCH_variable_write(UIaddr_pid_mode, (uint16_t)(MCUsystem.pid_mode));
+			TOUCH_variable_write(UIaddr_contorl_time, (uint16_t)(MCUsystem.control_time));
+			TOUCH_variable_write(UIaddr_pid_p, (int16_t)(pid_vector[control_id]->kp*1000));
+			TOUCH_variable_write(UIaddr_pid_i, (int16_t)(pid_vector[control_id]->ki*1000));
+			TOUCH_variable_write(UIaddr_pid_d, (int16_t)(pid_vector[control_id]->kd*1000));
+			TOUCH_variable_write(UIaddr_pid_delta_k, (int16_t)(MCUsystem.delta_k*1000));
 		}		
 	}				
 	else{

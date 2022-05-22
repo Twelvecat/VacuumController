@@ -98,7 +98,7 @@ void Error_Handler(void);
 	#define user_main_error(format, ...)
 #endif
 
-
+void FLASH_EEPROM_Write_config(void);
 
 /* USER CODE END Private defines */
 

@@ -31,6 +31,7 @@ void system_init(void){
 	MCUsystem.pid = &pid;
 	PID_init(MCUsystem.pid);
 	MCUsystem.pid_mode = 0;
+	MCUsystem.control_time = 5;
 	MCUsystem.delta_k = 2.0f;
 	MCUsystem.hp5806_A = &hp5806_A;
 	MCUsystem.hp5806_B = &hp5806_B;

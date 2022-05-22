@@ -39,6 +39,7 @@ struct _system{
 	float output_manual; //手动输出值
 	float delta_k;			//模糊pid delta
 	uint8_t pid_mode;			//pid模式：0为积分分离pid，1为模糊pid
+	uint8_t control_time;			//控制周期
 	uint8_t leak_status;			//泄漏标志位：0为未泄漏，1为泄漏
 	uint8_t wifi_status;			//wifi标志位：0为未连接，1为已连接
 };

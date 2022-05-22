@@ -136,7 +136,7 @@ void Monitor_modifications(void)
     HP5806_run(MCUsystem.hp5806_B);
 		TOUCH_curve_write();
 	}
-	if(count_pid>=5)
+	if(count_pid>=MCUsystem.control_time)
 	{//pid模块
 		count_pid=0;
 		if(MCUsystem.system_status->current == 2)
@@ -294,14 +294,53 @@ void process_safe_event(PriorityQueue *pq)
   * @param  用STM32中FLASH存储空间模拟EEPROM的读写
   * @retval 参数：写入要存储的值
   */
-void FLASH_EEPROM_Write(uint32_t n, uint8_t offset)
+
+typedef union
 {
-    HAL_FLASH_Unlock();     //解锁
-    uint32_t writeFlashData = n;        //代写入的值
-    uint32_t addr = 0x0800FC00 + offset*4;                  //写入的地址
-    HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,addr, writeFlashData); //向FLASH中写入
-    printf("at address:0x%x, read value:%d\r\n", addr, *(__IO uint32_t*)addr);
-    HAL_FLASH_Lock();
+	float  float_data;
+  uint32_t flash_data;
+}f_uint32;
+
+void FLASH_EEPROM_Write_config()
+{
+	uint32_t addr = 0x0800FC00;
+  //1、解锁FLASH
+
+		HAL_FLASH_Unlock();
+    //2、擦除FLASH
+    //初始化FLASH_EraseInitTypeDef
+    FLASH_EraseInitTypeDef f;
+    f.TypeErase = FLASH_TYPEERASE_PAGES;
+    f.PageAddress = addr;
+    f.NbPages = 1;
+    //设置PageError
+    uint32_t PageError = 0;
+    //调用擦除函数
+    HAL_FLASHEx_Erase(&f, &PageError);
+
+	//3、对FLASH烧写
+		f_uint32 tempflash;
+		tempflash.flash_data = (uint32_t)(MCUsystem.pid_mode)&0x00000001;
+    HAL_FLASH_Program(TYPEPROGRAM_WORD, addr, tempflash.flash_data);
+		tempflash.flash_data = (uint32_t)(MCUsystem.control_time)&0x00000001;
+		addr = addr+4;
+    HAL_FLASH_Program(TYPEPROGRAM_WORD, addr, tempflash.flash_data);
+		tempflash.float_data = MCUsystem.pid->Kp;
+		addr = addr+4;
+		HAL_FLASH_Program(TYPEPROGRAM_WORD, addr, tempflash.flash_data);
+		tempflash.float_data = MCUsystem.pid->Ki;
+		addr = addr+4;
+		HAL_FLASH_Program(TYPEPROGRAM_WORD, addr, tempflash.flash_data);
+		tempflash.float_data = MCUsystem.pid->Kd;
+		addr = addr+4;
+		HAL_FLASH_Program(TYPEPROGRAM_WORD, addr, tempflash.flash_data);
+		tempflash.float_data = MCUsystem.delta_k;
+		addr = addr+4;
+		HAL_FLASH_Program(TYPEPROGRAM_WORD, addr, tempflash.flash_data);
+
+    //4、锁住FLASH
+
+		HAL_FLASH_Lock();
 }
 /**
   * @brief  读出存储地址中的内容
@@ -362,11 +401,18 @@ int main(void)
 	safe_event_pq = HEAP_init(10); //容量为10的安全事件优先队列
 	system_init();
 	
+	f_uint32 tempflash;
+	
 	MCUsystem.pid_mode = (uint8_t)(FLASH_EEPROM_Read(0)&0x00000001);
-	MCUsystem.pid->Kp = FLASH_EEPROM_Read(1);
-	MCUsystem.pid->Ki = FLASH_EEPROM_Read(2);
-	MCUsystem.pid->Kd = FLASH_EEPROM_Read(3);
-	MCUsystem.delta_k = FLASH_EEPROM_Read(4);
+	MCUsystem.control_time = (uint8_t)(FLASH_EEPROM_Read(1)&0x00000001);
+	tempflash.flash_data = FLASH_EEPROM_Read(2);
+	MCUsystem.pid->Kp = tempflash.float_data;
+	tempflash.flash_data = FLASH_EEPROM_Read(3);
+	MCUsystem.pid->Ki = tempflash.float_data;
+	tempflash.flash_data = FLASH_EEPROM_Read(4);
+	MCUsystem.pid->Kd = tempflash.float_data;
+	tempflash.flash_data = FLASH_EEPROM_Read(5);
+	MCUsystem.delta_k = tempflash.float_data;
 	
   user_main_info("GPIO,IIC1/2,USART1/2,TIM2/3/4初始化完成");
   user_main_info("定时器3中断开启，周期%.2fHz", 72000000.0 / (htim3.Instance->ARR + 1) / (htim3.Instance->PSC + 1));
@@ -382,7 +428,6 @@ int main(void)
 	fuzzy_pid_params[control_id][2] = MCUsystem.pid->Kd;
 	pid_vector = fuzzy_pid_vector_init(fuzzy_pid_params, MCUsystem.delta_k, 2, 1, 0, mf_params, rule_base, DOF);
   HAL_Delay(2000);
-	FLASH_EEPROM_Write(0x12345678,0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
